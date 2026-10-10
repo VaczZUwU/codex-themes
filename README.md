@@ -1,4 +1,4 @@
-# Codex Doki
+# Codex Themes
 
 Original Doki palettes and character artwork in the Codex desktop app for Windows.
 Choose a theme from a searchable preview gallery inside **Settings → Appearance → Doki Theme**.
@@ -12,15 +12,15 @@ For Russian screenshots, see the [Russian instructions](README.ru.md#скрин�
 
 **New chat — Takanashi Rikka**
 
-![Empty new-chat screen in English](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/home-en.png)
+![Empty new-chat screen in English](https://raw.githubusercontent.com/VaczZUwU/codex-themes/main/docs/screenshots/home-en.png)
 
 **Appearance settings**
 
-![Doki settings in English](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/settings-en.png)
+![Doki settings in English](https://raw.githubusercontent.com/VaczZUwU/codex-themes/main/docs/screenshots/settings-en.png)
 
 **Theme gallery**
 
-![Theme gallery in English](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/gallery-en.png)
+![Theme gallery in English](https://raw.githubusercontent.com/VaczZUwU/codex-themes/main/docs/screenshots/gallery-en.png)
 
 ## Features
 
@@ -114,3 +114,9 @@ This project's own code is MIT licensed. Codex/OpenAI names and binaries belong 
 Its software has an [MIT license](https://github.com/doki-theme/doki-theme-vscode/blob/master/LICENSE);
 artwork rights remain with their respective authors. This project's license does not grant rights
 to Codex binaries, artwork or native localization files. See [third-party notices](THIRD_PARTY_NOTICES.md).
+
+## Startup update checks
+
+The development version checks public GitHub releases when Codex Themes starts. A newer version appears in a notification and in the Doki settings, with a link to its release page. Updates are installed manually. Numeric prereleases are included while this project is experimental. Offline mode and GitHub rate limits do not prevent startup.
+
+Previously named **Codex Doki**. Existing launcher and profile names are retained so saved themes and preferences remain available.

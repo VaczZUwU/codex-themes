@@ -22,6 +22,8 @@ jobs:
           node-version: '22'
       - run: python -m unittest discover -s tests -v
       - run: node --check src/doki.js
+      - run: node --check src/update-check.cjs
+      - run: node tests/test_update_checker.cjs
       - run: python scripts/package_release.py
   custom-theme-ui:
     runs-on: ubuntu-latest

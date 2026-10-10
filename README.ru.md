@@ -1,4 +1,4 @@
-# Codex Doki
+# Codex Themes
 
 Оригинальные темы и персонажи Doki в приложении Codex для Windows.
 Галерея с превью находится в **Настройки → Внешний вид → Doki Theme**.
@@ -12,15 +12,15 @@
 
 **Новый чат — Takanashi Rikka**
 
-![Пустой экран нового чата на русском](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/home-ru.png)
+![Пустой экран нового чата на русском](https://raw.githubusercontent.com/VaczZUwU/codex-themes/main/docs/screenshots/home-ru.png)
 
 **Настройки оформления**
 
-![Настройки Doki на русском](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/settings-ru.png)
+![Настройки Doki на русском](https://raw.githubusercontent.com/VaczZUwU/codex-themes/main/docs/screenshots/settings-ru.png)
 
 **Галерея тем**
 
-![Галерея тем на русском](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/gallery-ru.png)
+![Галерея тем на русском](https://raw.githubusercontent.com/VaczZUwU/codex-themes/main/docs/screenshots/gallery-ru.png)
 
 ## Возможности
 
@@ -92,3 +92,9 @@ py -3 install.py uninstall
 Код проекта — MIT. Doki Theme создан Unthrottled/Alex Simons; права на изображения принадлежат
 их авторам. Проект не связан с OpenAI и не распространяет исполняемые файлы Codex.
 [Лицензии и благодарности](THIRD_PARTY_NOTICES.md).
+
+## Проверка обновлений при запуске
+
+Версия из исходников проверяет публичные релизы GitHub при запуске Codex Themes. Если доступна новая версия, появятся уведомление и ссылка на релиз в настройках Doki. Обновления устанавливаются вручную. Пока проект экспериментальный, проверка учитывает и предварительные релизы с числовой версией. Отсутствие сети и ограничения GitHub не мешают запуску приложения.
+
+Прежнее название — **Codex Doki**. Имена существующих ярлыков и профилей сохранены, чтобы ваши темы и настройки оставались доступны.

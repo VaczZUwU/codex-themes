@@ -118,7 +118,7 @@ class InstallerTests(unittest.TestCase):
     def test_fresh_install_and_uninstall_leave_source_and_profile(self):
         source = self.root/'app'
         (source/'resources').mkdir(parents=True)
-        header = make_archive(source/'resources/app.asar', {'webview/index.html': b'<body></body>', 'keep': b'original'})
+        header = make_archive(source/'resources/app.asar', {'webview/index.html': b'<body></body>', 'keep': b'original', '.vite/build/early-bootstrap.js': b'// main'})
         original_exe = b'executable'+hashlib.sha256(header).hexdigest().encode()
         (source/'ChatGPT.exe').write_bytes(original_exe)
         config = configparser.ConfigParser()
@@ -126,7 +126,7 @@ class InstallerTests(unittest.TestCase):
         config.read_string('[Owl]\nUserDataDirectoryName=Codex\nAppVersion=test\n')
         prepared = {'source': source, 'archive': source/'resources/app.asar', 'exe': original_exe,
                     'html': '<body></body>', 'themes': [], 'locales': {}, 'config': config,
-                    'codexVersion': 'test', 'dokiVersion': 'test'}
+                    'codexVersion': 'test', 'dokiVersion': 'test', 'mainEntry': '.vite/build/early-bootstrap.js', 'mainSource': b'// main'}
         profile = self.root/'profile'
         profile.mkdir()
         (profile/'preferences').write_text('retained')

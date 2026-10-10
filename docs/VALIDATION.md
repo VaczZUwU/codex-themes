@@ -35,3 +35,10 @@ The release should remain an experimental prerelease while this final installati
 - Updated the isolated working desktop copy and visually inspected the Russian editor inside the native Appearance settings at 100% zoom.
 - Selected the existing custom Honkai theme in the real Codex copy, stopped all processes belonging to that isolated runtime and launched it again: its purple custom palette restored on the new-chat screen.
 - Browser editor snapshots use a controlled test fixture and are kept as local QA artifacts; they are not presented as native-app screenshots in the README.
+
+## Startup update checks
+
+- Node tests verify numeric version comparisons, draft exclusion, numeric prereleases, trusted release URLs, anonymous requests, malformed responses, rate limits and timeouts.
+- Browser tests verify the update notification, release link, Russian translation, dismissal and settings status.
+- Patched and restarted the isolated desktop runtime. Its main process successfully fetched releases from `VaczZUwU/codex-themes` and persisted the startup-check cache in the existing profile.
+- The native renderer CSP remains unchanged; the main process performs the network check.

@@ -215,8 +215,11 @@ def prepare(source, extension=None, allow_unsupported=False):
         raise ValueError(f'Untested versions: Codex {version}, Doki {doki_version}. '
                          'See docs/COMPATIBILITY.md. --allow-unsupported opts into testing this combination.')
     locales = extract_locales(archive)
+    main_entry = '.vite/build/early-bootstrap.js'
+    main_source = read_entry(archive, tree, base, main_entry)
     return {'source': source, 'archive': archive, 'themes': themes, 'locales': locales,
-            'html': html, 'exe': exe, 'config': config, 'codexVersion': version, 'dokiVersion': doki_version}
+            'html': html, 'exe': exe, 'config': config, 'codexVersion': version, 'dokiVersion': doki_version,
+            'mainEntry': main_entry, 'mainSource': main_source}
 
 
 def obtain_asset(name, cache, offline):
@@ -245,6 +248,12 @@ def obtain_asset(name, cache, offline):
             time.sleep(1)
 
 
+def update_hook(version):
+    return ('\n/* codex-themes-update-hook */\n'
+            ';try{require("../../webview/doki/update-check.cjs").start(require("electron"),'
+            + json.dumps(version) + ');}catch{}\n').encode()
+
+
 def install(prepared, destination, cache, offline=False):
     destination = destination.resolve()
     source = prepared['source']
@@ -261,6 +270,8 @@ def install(prepared, destination, cache, offline=False):
           +(BASE/'src/doki.js').read_text(encoding='utf8')).encode()
     html = prepared['html'].replace('</body>', '<script src="./doki/doki.js"></script>\n</body>')
     additions = {'webview/index.html': html.encode(), 'webview/doki/doki.js': js}
+    additions['webview/doki/update-check.cjs'] = (BASE/'src/update-check.cjs').read_bytes()
+    additions[prepared['mainEntry']] = prepared['mainSource'] + update_hook(VERSION)
     additions.update({'webview/doki/'+name: data for name, data in assets.items()})
     size = sum(p.stat().st_size for p in source.rglob('*') if p.is_file()) + sum(map(len, additions.values()))
     destination.parent.mkdir(parents=True, exist_ok=True)

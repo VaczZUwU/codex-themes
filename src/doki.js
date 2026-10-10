@@ -49,6 +49,23 @@
   Object.assign(messages.en,{optimizeWallpaper:'Optimize large wallpapers',optimizedHint:'PNG, JPEG or WebP. Large images are optimized for a 4K background; disable optimization to keep the original.',imageSize:'Wallpaper size'});
   Object.assign(messages.ru,{optimizeWallpaper:'Оптимизировать тяжёлые фоны',optimizedHint:'PNG, JPEG или WebP. Тяжёлые картинки оптимизируются под фон до 4K; отключите оптимизацию, чтобы сохранить оригинал.',imageSize:'Размер фона'});
   Object.assign(messages['ru-RU'],messages.ru);messages.en.customHint=messages.en.optimizedHint;messages.ru.customHint=messages.ru.optimizedHint;messages['ru-RU'].customHint=messages.ru.customHint;
+  Object.assign(messages.en,{updates:'Updates',checkingUpdates:'Checking GitHub releases…',updateAvailable:'A new Codex Themes release is available',openRelease:'Open release',upToDate:'The installed release is up to date',updatesOffline:'Could not check updates. Try again on the next launch.'});
+  Object.assign(messages.ru,{updates:'Обновления',checkingUpdates:'Проверка релизов GitHub…',updateAvailable:'Доступен новый релиз Codex Themes',openRelease:'Открыть релиз',upToDate:'Установлена актуальная версия релиза',updatesOffline:'Не удалось проверить обновления. Проверка повторится при следующем запуске.'});
+  Object.assign(messages['ru-RU'],messages.ru);
+  let updateStatus=window.__codexThemesUpdate||null,updateNotice=null;
+  function renderUpdates(){
+    if(!updateStatus)return;
+    const text=updateStatus.available?`${tr('updateAvailable')}: ${updateStatus.version}`:tr(updateStatus.checking?'checkingUpdates':updateStatus.offline?'updatesOffline':'upToDate');
+    $('updates-text').textContent=text+` · ${updateStatus.current}`;$('updates-link').hidden=!updateStatus.available;
+    if(updateStatus.available)$('updates-link').href=updateStatus.url;
+    let dismissed=false;try{dismissed=localStorage.getItem('codex-themes-dismissed-update')===updateStatus.version;}catch{}
+    updateNotice?.remove();updateNotice=null;if(!updateStatus.available||dismissed)return;
+    updateNotice=document.createElement('aside');updateNotice.id='codex-themes-update-notice';updateNotice.style.cssText='position:fixed;right:24px;bottom:24px;width:min(340px,calc(100vw - 48px));z-index:2147483646';
+    const box=updateNotice.attachShadow({mode:'open'});box.innerHTML='<style>:host{font:13px system-ui;color:var(--color-text,#eee)}section{background:var(--color-surface-elevated,#232323);border:1px solid var(--color-border,#777);border-radius:14px;padding:16px;box-shadow:0 8px 30px #0005}p{margin:0 24px 12px 0;line-height:1.5}a{color:var(--doki-accent,var(--color-text,#eee))}button{position:absolute;right:10px;top:10px;border:0;background:transparent;color:inherit;font:18px system-ui;cursor:pointer}</style><section role="status"><button type="button">×</button><p></p><a target="_blank" rel="noopener noreferrer"></a></section>';
+    box.querySelector('p').textContent=text;const a=box.querySelector('a');a.textContent=tr('openRelease');a.href=updateStatus.url;
+    const close=box.querySelector('button');close.setAttribute('aria-label',tr('close'));close.onclick=()=>{try{localStorage.setItem('codex-themes-dismissed-update',updateStatus.version);}catch{}updateNotice.remove();updateNotice=null;};document.body.append(updateNotice);
+  }
+  window.addEventListener('codex-themes-update',event=>{const status=event.detail;if(!status||typeof status.current!=='string')return;if(status.available&&(!/^\d+\.\d+\.\d+$/.test(status.version)||!/^https:\/\/github\.com\/VaczZUwU\/codex-themes\/releases\/tag\/v?\d+\.\d+\.\d+$/.test(status.url)))return;updateStatus=status;if(initialized)renderUpdates();});
   let customDB, customBusy=false, editing=null, draftImage='', draftOriginal='', draftAccent=null, initialized=false, lastPersisted='', selectionWrite=Promise.resolve();
   function database(){return new Promise((resolve,reject)=>{const request=indexedDB.open('codex-doki-custom-v1',1);request.onupgradeneeded=()=>request.result.createObjectStore('themes');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});}
   async function storeCustom(next){
@@ -90,7 +107,7 @@
   host.hidden = true;
   const shadow = host.attachShadow({mode: 'open'});
   shadow.innerHTML = `<style>
-    :host{display:block;font:13px system-ui;color:var(--color-text,#eee)}:host([hidden]){display:none!important}
+    :host{display:block;font:13px system-ui;color:var(--color-text,#eee)}:host([hidden]){display:none!important}#updates-link[hidden]{display:none!important}
     *{box-sizing:border-box}button,input,select{font:inherit;color:inherit}button,select{cursor:pointer}
     button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--doki-accent);outline-offset:3px}
     h2{font-size:13px;font-weight:600;margin:10px 0 16px}h2:not(:first-child){margin-top:28px}
@@ -131,7 +148,7 @@
       <div class="row"><label for="theme-reading" data-i18n="themeReading"></label><input id="theme-reading" type="checkbox" role="switch"></div>
     </div>
     <h2 data-i18n="customThemes"></h2><div class="group"><div class="custom-actions"><button type="button" class="chip" id="custom-create" data-i18n="createTheme"></button><button type="button" class="chip" id="custom-edit" data-i18n="editTheme"></button><button type="button" class="chip" id="custom-import" data-i18n="importTheme"></button><button type="button" class="chip" id="custom-export" data-i18n="exportTheme"></button><button type="button" class="chip" id="custom-delete" data-i18n="deleteTheme"></button></div><input hidden id="custom-import-file" type="file" accept=".json,application/json"></div>
-    <footer><span id="count"></span><button class="chip" id="reset" data-i18n="reset"></button></footer><small id="status" role="status"></small>
+    <h2 data-i18n="updates"></h2><div class="group"><div class="row"><span id="updates-text" role="status" data-i18n="checkingUpdates"></span><a id="updates-link" class="chip" hidden target="_blank" rel="noopener noreferrer" data-i18n="openRelease"></a></div></div><footer><span id="count"></span><button class="chip" id="reset" data-i18n="reset"></button></footer><small id="status" role="status"></small>
   </section><button id="toggle">Doki</button>
   <dialog id="theme-dialog" aria-labelledby="gallery-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="gallery-title" data-i18n="chooseTheme"></h3><button id="close-gallery" type="button" aria-label="Close">×</button></div><input id="search" type="search" placeholder="Senko, Rem, Fate…"></div><div id="gallery"></div></dialog>
   <dialog id="artwork-dialog" aria-labelledby="artwork-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="artwork-title" data-i18n="variant"></h3><button id="close-artwork" type="button" aria-label="Close">×</button></div></div><div id="artwork-gallery"></div></dialog>
@@ -145,7 +162,7 @@
     $('search').setAttribute('aria-label',tr('search'));$('search').placeholder=tr('search');$('close-gallery').setAttribute('aria-label',tr('close'));
     $('close-artwork').setAttribute('aria-label',tr('close'));$('custom-close').setAttribute('aria-label',tr('close'));
     if($('custom-dialog').open){$('custom-title').textContent=tr(editing?'editTheme':'createTheme');previewCustom();}
-    variants();renderGallery();
+    variants();renderGallery();if(initialized)renderUpdates();
   }
   function populate() {
     const query = $('search').value.trim().toLowerCase();
@@ -490,7 +507,7 @@
       if(stored.settings&&typeof stored.settings.theme==='string')settings={...defaults,...stored.settings,language:codexLanguage()};
     }catch{customDB?.close();customDB=null;}
     initialized=true;settings.language=codexLanguage();
-    document.body.append(host);translate();populate();apply();syncAppearanceIntegration();
+    document.body.append(host);translate();populate();apply();syncAppearanceIntegration();renderUpdates();
     if(!customDB)$('status').textContent=tr('storageError');
   }
   initialize();
