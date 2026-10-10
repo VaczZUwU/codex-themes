@@ -44,3 +44,5 @@ The release should remain an experimental prerelease while this final installati
 - The native renderer CSP remains unchanged; the main process performs the network check.
 
 - Animated background tests use synthetic two-frame looping GIF, WebP and APNG fixtures wider than the optimization threshold. Upload, export/import, editing and full Chromium restarts preserve every original byte with optimization enabled.
+
+- Gallery deletion tests verify cancellation, absence of deletion controls on built-in themes, preserving the active theme when deleting an old theme, Russian button labels, selected-theme deactivation and durable deletion after full Chromium restarts.

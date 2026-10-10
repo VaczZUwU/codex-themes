@@ -142,6 +142,7 @@
     dialog{color:var(--color-text);background:var(--color-surface);border:1px solid var(--color-border);border-radius:16px;padding:0;width:min(760px,calc(100vw - 48px));max-height:min(740px,calc(100vh - 64px));box-shadow:0 24px 90px #0008}dialog::backdrop{background:#0008;backdrop-filter:blur(4px)}
     .gallery-header{padding:20px 20px 16px;border-bottom:1px solid var(--color-border)}.gallery-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.gallery-heading h3{margin:0;font-size:16px}#close-gallery{border:0;background:transparent;font-size:22px;width:28px;height:28px;border-radius:8px}#close-gallery:hover{background:var(--color-surface-secondary)}
     #search{width:100%;border:1px solid var(--color-border);background:var(--color-surface-secondary);border-radius:8px;padding:10px 12px}#gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:20px;overflow:auto;max-height:490px}.theme-card{padding:0;text-align:left;border:1px solid var(--color-border);border-radius:10px;background:var(--color-surface-secondary);overflow:hidden}.theme-card:hover{border-color:var(--color-text-secondary)}.theme-card[aria-pressed=true]{outline:2px solid var(--doki-accent);outline-offset:1px}.theme-card .thumbnail{height:108px;overflow:hidden;background:var(--card-bg)}.theme-card img{width:100%;height:100%;object-fit:cover;object-position:right}.card-label{display:block;padding:9px 10px;font-weight:600;font-size:12px}.card-group{display:block;font-weight:400;font-size:10px;margin-top:3px;color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.empty{grid-column:1/-1;text-align:center;padding:30px;color:var(--color-text-secondary)}
+    .custom-gallery-entry{position:relative;min-width:0}.custom-gallery-entry .theme-card{width:100%;height:100%}.custom-gallery-entry .card-label{padding-inline-end:40px}.gallery-delete{position:absolute;inset-inline-end:8px;bottom:12px;width:28px;height:28px;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);color:var(--color-text);font-size:20px;line-height:1}.gallery-delete:hover{background:var(--color-surface-secondary)}#gallery-error:empty{display:none}#gallery-error{margin:12px 20px;font-size:12px}
     :host([dir=rtl]) .mock{left:auto;right:14px}:host([dir=rtl]) .preview-title{left:auto;right:12px}.theme-card{text-align:start}.range{direction:ltr}
     .variant-count{display:block;margin-top:7px;font-size:10px;font-weight:400;color:var(--color-text-secondary)}
     #artwork-dialog{width:min(480px,calc(100vw - 48px))}#artwork-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:20px}#artwork-gallery.single{grid-template-columns:1fr}#artwork-gallery .thumbnail{height:150px}
@@ -165,7 +166,7 @@
     <h2 data-i18n="customThemes"></h2><div class="group"><div class="custom-actions"><button type="button" class="chip" id="custom-create" data-i18n="createTheme"></button><button type="button" class="chip" id="custom-edit" data-i18n="editTheme"></button><button type="button" class="chip" id="custom-import" data-i18n="importTheme"></button><button type="button" class="chip" id="custom-export" data-i18n="exportTheme"></button><button type="button" class="chip" id="custom-delete" data-i18n="deleteTheme"></button></div><input hidden id="custom-import-file" type="file" accept=".json,application/json"></div>
     <h2 data-i18n="updates"></h2><div class="group"><div class="row"><span id="updates-text" role="status" data-i18n="checkingUpdates"></span><a id="updates-link" class="chip" hidden target="_blank" rel="noopener noreferrer" data-i18n="openRelease"></a></div></div><footer><span id="count"></span><button class="chip" id="reset" data-i18n="reset"></button></footer><small id="status" role="status"></small>
   </section><button id="toggle">Doki</button>
-  <dialog id="theme-dialog" aria-labelledby="gallery-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="gallery-title" data-i18n="chooseTheme"></h3><button id="close-gallery" type="button" aria-label="Close">×</button></div><input id="search" type="search" placeholder="Senko, Rem, Fate…"></div><div id="gallery"></div></dialog>
+  <dialog id="theme-dialog" aria-labelledby="gallery-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="gallery-title" data-i18n="chooseTheme"></h3><button id="close-gallery" type="button" aria-label="Close">×</button></div><input id="search" type="search" placeholder="Senko, Rem, Fate…"></div><p id="gallery-error" role="alert"></p><div id="gallery"></div></dialog>
   <dialog id="artwork-dialog" aria-labelledby="artwork-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="artwork-title" data-i18n="variant"></h3><button id="close-artwork" type="button" aria-label="Close">×</button></div></div><div id="artwork-gallery"></div></dialog>
   <dialog id="custom-dialog" aria-labelledby="custom-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="custom-title"></h3><button type="button" id="custom-close" class="chip">×</button></div></div><form id="custom-form"><div class="row"><label for="custom-name" data-i18n="themeName"></label><input id="custom-name" required></div><div class="row"><label for="custom-background" data-i18n="backgroundColor"></label><input id="custom-background" type="color"></div><div class="row"><label for="custom-foreground" data-i18n="textColor"></label><input id="custom-foreground" type="color"></div><div class="row"><label for="custom-accent" data-i18n="accentColor"></label><input id="custom-accent" type="color"></div><div class="row"><label for="custom-auto-accent" data-i18n="autoAccent"></label><input id="custom-auto-accent" type="checkbox" role="switch"></div><div class="row"><label for="custom-optimize" data-i18n="optimizeWallpaper"></label><input id="custom-optimize" type="checkbox" role="switch"></div><div id="custom-preview"></div><p id="custom-image-info" role="status"></p><div class="custom-actions"><button type="button" class="chip" id="custom-upload" data-i18n="uploadWallpaper"></button><button type="button" class="chip" id="custom-remove" data-i18n="removeWallpaper"></button><input hidden id="custom-image" type="file" accept="image/png,image/jpeg,image/webp,image/gif"></div><p id="custom-hint" data-i18n="customHint"></p><p id="custom-error" role="alert"></p><div class="custom-actions"><button type="submit" class="chip" id="custom-save" data-i18n="saveTheme"></button><button type="button" class="chip" id="custom-cancel" data-i18n="cancel"></button></div></form></dialog>`;
   const $ = id => shadow.getElementById(id);
@@ -200,11 +201,16 @@
       card.style.setProperty('--card-bg',t.colors.background);
       const thumb=document.createElement('div');thumb.className='thumbnail';const img=document.createElement('img');img.loading='lazy';img.alt='';img.src=imageURL(t.images[0]);thumb.append(img);
       const label=document.createElement('span');label.className='card-label';label.textContent=t.name;const group=document.createElement('span');group.className='card-group';group.textContent=t.custom?tr('customThemes'):t.group;const count=document.createElement('span');count.className='variant-count';count.textContent=variantCount(t.images.length);label.append(group,count);card.append(thumb,label);
-      card.onclick=()=>{settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();$('theme-dialog').close();$('theme-picker').focus();};$('gallery').append(card);
+      card.disabled=customBusy;card.onclick=()=>{if(customBusy)return;settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();$('theme-dialog').close();$('theme-picker').focus();};
+      if(t.custom){
+        const entry=document.createElement('div');entry.className='custom-gallery-entry';
+        const remove=document.createElement('button');remove.type='button';remove.className='gallery-delete';remove.disabled=customBusy;remove.textContent='×';remove.setAttribute('aria-label',`${tr('deleteTheme')}: ${t.name}`);remove.title=remove.getAttribute('aria-label');
+        remove.onclick=()=>deleteCustom(t,$('gallery-error'));entry.append(card,remove);$('gallery').append(entry);
+      }else $('gallery').append(card);
     }
     if(!matching.length){const empty=document.createElement('div');empty.className='empty';empty.textContent=tr('empty');$('gallery').append(empty);}
   }
-  $('theme-picker').onclick=()=>{$('search').value='';renderGallery();$('theme-dialog').showModal();$('search').focus();};
+  $('theme-picker').onclick=()=>{$('search').value='';$('gallery-error').textContent='';renderGallery();$('theme-dialog').showModal();$('search').focus();};
   $('close-gallery').onclick=()=>{$('theme-dialog').close();$('theme-picker').focus();};
   $('theme-dialog').addEventListener('click',event=>{if(event.target===$('theme-dialog')){const r=$('theme-dialog').getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)$('theme-dialog').close();}});
   function renderArtwork() {
@@ -322,6 +328,7 @@
     const selected=settings.active;
     for(const id of ['custom-edit','custom-export','custom-delete'])$(id).disabled=customBusy||!selected||!current().custom;
     $('custom-create').disabled=customBusy;$('custom-import').disabled=customBusy;
+    $('gallery').querySelectorAll('button').forEach(button=>button.disabled=customBusy);
     $('dark').disabled=selected&&!!current().custom;
     $('theme-thumb').hidden=!selected;$('variant-thumb').hidden=!selected;
     $('variant-picker').disabled=!selected;
@@ -421,7 +428,16 @@
     const next=themes.filter(t=>t.custom&&t!==editing);next.push(t);await storeCustom(next);
     settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();await selectionWrite;$('custom-dialog').close();$('theme-picker').focus();$('status').textContent=tr('customSaved');
   },$('custom-error'));};
-  $('custom-delete').onclick=()=>{const t=current();if(!t.custom||!confirm(tr('deleteConfirm')))return;customOperation(async()=>{await storeCustom(themes.filter(x=>x.custom&&x!==t));deactivateDoki();populate();apply();await selectionWrite;renderGallery();});};
+  function deleteCustom(t,errorElement=$('status')){
+    if(customBusy||!t.custom||!confirm(`${tr('deleteConfirm')}\n${t.name}`))return;
+    customOperation(async()=>{
+      const selected=settings.theme===t.name;
+      await storeCustom(themes.filter(x=>x.custom&&x!==t));
+      if(selected)deactivateDoki();populate();apply();await selectionWrite;renderGallery();
+      if($('theme-dialog').open)$('search').focus();
+    },errorElement);
+  }
+  $('custom-delete').onclick=()=>deleteCustom(current());
   $('custom-export').onclick=()=>{if(!current().custom)return;const t=current(),blob=new Blob([JSON.stringify({format:'codex-doki-theme',version:1,theme:portable(t)},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=t.name.replace(/[^a-z0-9_-]/gi,'_')+'.json';shadow.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);};
   $('custom-import').onclick=()=>{$('custom-import-file').value='';$('custom-import-file').click();};
   $('custom-import-file').onchange=()=>customOperation(async()=>{const file=$('custom-import-file').files[0];if(!file)return;const payload=JSON.parse(await file.text());if(payload.format!=='codex-doki-theme'||payload.version!==1)throw new Error('formatError');const t=validateCustom(payload.theme);uniqueName(t.name);if(t.images[0].data!==blankImage){const img=await decodeImage(t.images[0].data);t.images[0].data=await optimizedWallpaper(img,t.images[0].data,t.optimizeWallpaper);}const next=themes.filter(t=>t.custom);await storeCustom([...next,t]);settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();await selectionWrite;$('status').textContent=tr('imported');});

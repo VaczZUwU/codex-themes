@@ -30,6 +30,49 @@ class Handler(BaseHTTPRequestHandler):
 
 @unittest.skipIf(sync_playwright is None, 'Install playwright and Chromium for browser checks')
 class CustomThemes(unittest.TestCase):
+    def test_delete_old_theme_from_gallery_without_changing_current_theme(self):
+        server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
+        threading.Thread(target=server.serve_forever,daemon=True).start()
+        try:
+            with tempfile.TemporaryDirectory() as profile,sync_playwright() as p:
+                def launch():
+                    context=p.chromium.launch_persistent_context(profile,viewport={'width':1000,'height':1050})
+                    page=context.pages[0];page.goto(f'http://127.0.0.1:{server.server_port}/');page.locator('#doki-settings-tab').click()
+                    return context,page,page.locator('#doki-controls')
+                context,page,h=launch()
+                for name in ['Old theme','Current theme']:
+                    h.locator('#custom-create').click();h.locator('#custom-name').fill(name)
+                    h.locator('#custom-save').click();expect(h.locator('#custom-dialog')).not_to_be_visible()
+                h.locator('#theme-picker').click();h.locator('#search').fill('Senko')
+                self.assertEqual(h.locator('.gallery-delete').count(),0)
+                h.locator('#search').fill('Old theme')
+                def dismiss(dialog):dialog.dismiss()
+                page.once('dialog',dismiss)
+                h.locator('.gallery-delete').click();expect(h.locator('#gallery .theme-card')).to_have_count(1)
+                expect(h.locator('#theme-name')).to_have_text('Current theme')
+                page.once('dialog',lambda d:d.accept());h.locator('.gallery-delete').click()
+                expect(h.locator('#gallery .theme-card')).to_have_count(0)
+                expect(h.locator('#theme-dialog')).to_be_visible()
+                expect(h.locator('#theme-name')).to_have_text('Current theme')
+                self.assertTrue(page.evaluate('window.__dokiThemeStatus.active'))
+                context.close();context,page,h=launch()
+                expect(h.locator('#theme-name')).to_have_text('Current theme')
+                h.locator('#theme-picker').click();h.locator('#search').fill('Old theme')
+                expect(h.locator('#gallery .theme-card')).to_have_count(0)
+                page.evaluate("document.documentElement.lang='ru-RU'")
+                h.locator('#search').fill('Current theme')
+                expect(h.locator('.gallery-delete')).to_have_attribute('aria-label','Удалить тему: Current theme')
+                page.once('dialog',lambda d:d.accept());h.locator('.gallery-delete').click()
+                expect(h.locator('#theme-name')).to_have_text('Не выбрана')
+                expect(h.locator('#gallery .theme-card')).to_have_count(0)
+                self.assertFalse(page.evaluate('window.__dokiThemeStatus.active'))
+                context.close();context,page,h=launch()
+                self.assertFalse(page.evaluate('window.__dokiThemeStatus.active'))
+                h.locator('#theme-picker').click();h.locator('#search').fill('Current theme')
+                expect(h.locator('#gallery .theme-card')).to_have_count(0)
+                context.close()
+        finally:server.shutdown();server.server_close()
+
     def test_animated_wallpapers_preserve_frames_import_and_restart(self):
         # Two-frame looping fixtures are wider than the static optimization threshold.
         fixtures=json.loads((ROOT/'tests/animated_wallpapers.json').read_text())

@@ -120,3 +120,5 @@ to Codex binaries, artwork or native localization files. See [third-party notice
 The development version checks public GitHub releases when Codex Themes starts. A newer version appears in a notification and in the Doki settings, with a link to its release page. Updates are installed manually. Numeric prereleases are included while this project is experimental. Offline mode and GitHub rate limits do not prevent startup.
 
 Previously named **Codex Doki**. Existing launcher and profile names are retained so saved themes and preferences remain available.
+
+Delete older custom themes directly from their gallery cards using the × button, without applying them first. Confirm the theme name before deletion. Deleting an inactive theme preserves the current appearance; deleting the selected custom theme restores native appearance.
