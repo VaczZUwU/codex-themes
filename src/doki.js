@@ -385,14 +385,28 @@
   $('enabled').onchange=()=>{settings.enabled=$('enabled').checked;apply();};
   $('reset').onclick=()=>{const language=settings.language;settings={...defaults,language};$('search').value='';translate();populate();apply();};
   shadow.addEventListener('keydown',e=>{if(e.key==='Escape'&&!host.hasAttribute('data-embedded')){$('panel').classList.remove('open');$('toggle').setAttribute('aria-expanded','false');$('toggle').focus();}});
-  function wallpaperAccent(img){
+  function wallpaperAccent(img,buckets=new Map()){
     const canvas=document.createElement('canvas');canvas.width=canvas.height=64;
     const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,64,64);
-    const pixels=ctx.getImageData(0,0,64,64).data,buckets=new Map();
+    const pixels=ctx.getImageData(0,0,64,64).data;
     for(let i=0;i<pixels.length;i+=4){if(pixels[i+3]<128)continue;const color=[pixels[i],pixels[i+1],pixels[i+2]],max=Math.max(...color),min=Math.min(...color),sat=(max-min)/255,light=luminance(color);if(light<.025||light>.9)continue;
       const key=color.map(v=>v>>4).join(',');const bucket=buckets.get(key)||{weight:0,total:0,sum:[0,0,0]};const weight=.1+sat*sat*3;bucket.weight+=weight;bucket.total++;color.forEach((v,k)=>bucket.sum[k]+=v);buckets.set(key,bucket);
     }
     const best=[...buckets.values()].sort((a,b)=>b.weight-a.weight)[0];return best?hex(best.sum.map(v=>v/best.total)):null;
+  }
+  async function sampledWallpaperAccent(img,data){
+    if(!animatedWallpaper(data)||typeof ImageDecoder==='undefined')return wallpaperAccent(img);
+    let decoder;
+    try{
+      const type=data.slice(5,data.indexOf(';')),bytes=Uint8Array.from(atob(data.slice(data.indexOf(',')+1)),c=>c.charCodeAt(0));
+      decoder=new ImageDecoder({data:bytes,type,preferAnimation:true});await decoder.tracks.ready;
+      const count=decoder.tracks.selectedTrack?.frameCount||1,buckets=new Map();let accent=null;
+      // Sample across the animation; transparent title frames should not pick the palette.
+      for(const index of new Set(Array.from({length:Math.min(count,8)},(_,i)=>Math.floor(i*count/Math.min(count,8))))){
+        const {image}=await decoder.decode({frameIndex:index});try{accent=wallpaperAccent(image,buckets);}finally{image.close();}
+      }
+      return accent||wallpaperAccent(img);
+    }catch{return wallpaperAccent(img);}finally{decoder?.close();}
   }
   function pickAccent(){if(!$('custom-auto-accent').checked)return;const bg=rgb($('custom-background').value);$('custom-accent').value=hex(readable(rgb(draftAccent||current().colors.accent),[bg,mix(bg,readable(rgb($('custom-foreground').value),[bg],7),.09)],3.1));}
   function previewCustom(){
@@ -403,7 +417,7 @@
     editing=theme;draftAccent=null;$('custom-optimize').checked=theme?.optimizeWallpaper!==false;$('custom-auto-accent').checked=theme?theme.autoAccent===true:true;draftImage=theme?.images[0].data||'';if(draftImage===blankImage)draftImage='';draftOriginal=draftImage;
     $('custom-title').textContent=tr(theme?'editTheme':'createTheme');$('custom-name').value=theme?.name||'';
     for(const field of ['background','foreground','accent'])$('custom-'+field).value=(theme||current()).colors[field];
-    $('custom-error').textContent='';$('custom-image').value='';previewCustom();$('custom-dialog').showModal();$('custom-name').focus();if(draftImage)customOperation(async()=>{const img=await decodeImage(draftOriginal);draftImage=await optimizedWallpaper(img,draftOriginal,$('custom-optimize').checked);draftAccent=wallpaperAccent(img);pickAccent();previewCustom();},$('custom-error'));else{pickAccent();previewCustom();}
+    $('custom-error').textContent='';$('custom-image').value='';previewCustom();$('custom-dialog').showModal();$('custom-name').focus();if(draftImage)customOperation(async()=>{const img=await decodeImage(draftOriginal);draftImage=await optimizedWallpaper(img,draftOriginal,$('custom-optimize').checked);draftAccent=await sampledWallpaperAccent(img,draftOriginal);pickAccent();previewCustom();},$('custom-error'));else{pickAccent();previewCustom();}
   }
   async function customOperation(action,errorElement=$('status')){
     if(customBusy)return;customBusy=true;syncSelectionDisplay();$('custom-save').disabled=true;errorElement.textContent='';
@@ -423,7 +437,7 @@
     const file=$('custom-image').files[0];if(!file)return;
     if(!['image/png','image/jpeg','image/webp','image/gif'].includes(file.type))throw new Error('imageError');
     const object=URL.createObjectURL(file);
-    try{const img=await decodeImage(object);const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('imageError'));reader.readAsDataURL(file);});draftOriginal=data;draftImage=await optimizedWallpaper(img,data,$('custom-optimize').checked);draftAccent=wallpaperAccent(img);pickAccent();previewCustom();}finally{URL.revokeObjectURL(object);}
+    try{const img=await decodeImage(object);const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('imageError'));reader.readAsDataURL(file);});draftOriginal=data;draftImage=await optimizedWallpaper(img,data,$('custom-optimize').checked);draftAccent=await sampledWallpaperAccent(img,draftOriginal);pickAccent();previewCustom();}finally{URL.revokeObjectURL(object);}
   },$('custom-error'));
   $('custom-form').onsubmit=event=>{event.preventDefault();customOperation(async()=>{
     const t=validateCustom({name:$('custom-name').value,colors:Object.fromEntries(['background','foreground','accent'].map(f=>[f,$('custom-'+f).value])),wallpaper:draftImage,autoAccent:$('custom-auto-accent').checked,optimizeWallpaper:$('custom-optimize').checked});uniqueName(t.name,editing);
@@ -450,7 +464,7 @@
   $('custom-delete').onclick=()=>deleteCustom(current());
   $('custom-export').onclick=()=>{if(!current().custom)return;const t=current(),blob=new Blob([JSON.stringify({format:'codex-doki-theme',version:1,theme:portable(t)},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=t.name.replace(/[^a-z0-9_-]/gi,'_')+'.json';shadow.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);};
   $('custom-import').onclick=()=>{$('custom-import-file').value='';$('custom-import-file').click();};
-  $('custom-import-file').onchange=()=>customOperation(async()=>{const file=$('custom-import-file').files[0];if(!file)return;const payload=JSON.parse(await file.text());if(payload.format!=='codex-doki-theme'||payload.version!==1)throw new Error('formatError');const t=validateCustom(payload.theme);uniqueName(t.name);if(t.images[0].data!==blankImage){const img=await decodeImage(t.images[0].data);t.images[0].data=await optimizedWallpaper(img,t.images[0].data,t.optimizeWallpaper);}const next=themes.filter(t=>t.custom);await storeCustom([...next,t]);settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();await selectionWrite;$('status').textContent=tr('imported');});
+  $('custom-import-file').onchange=()=>customOperation(async()=>{const file=$('custom-import-file').files[0];if(!file)return;const payload=JSON.parse(await file.text());if(payload.format!=='codex-doki-theme'||payload.version!==1)throw new Error('formatError');const t=validateCustom(payload.theme);uniqueName(t.name);if(t.images[0].data!==blankImage){const img=await decodeImage(t.images[0].data);if(t.autoAccent){const accent=await sampledWallpaperAccent(img,t.images[0].data);if(accent){const bg=rgb(t.colors.background);t.colors.accent=hex(readable(rgb(accent),[bg,mix(bg,readable(rgb(t.colors.foreground),[bg],7),.09)],3.1));}}t.images[0].data=await optimizedWallpaper(img,t.images[0].data,t.optimizeWallpaper);}const next=themes.filter(t=>t.custom);await storeCustom([...next,t]);settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();await selectionWrite;$('status').textContent=tr('imported');});
 
   const integrationStyle=document.createElement('style');
   integrationStyle.id='doki-settings-integration-style';

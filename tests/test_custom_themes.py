@@ -30,6 +30,39 @@ class Handler(BaseHTTPRequestHandler):
 
 @unittest.skipIf(sync_playwright is None, 'Install playwright and Chromium for browser checks')
 class CustomThemes(unittest.TestCase):
+    def test_auto_accent_samples_animation_and_static_images(self):
+        fixtures=json.loads((ROOT/'tests/accent_wallpapers.json').read_text())
+        server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
+        threading.Thread(target=server.serve_forever,daemon=True).start()
+        try:
+            with sync_playwright() as p:
+                browser=p.chromium.launch();page=browser.new_page(viewport={'width':1000,'height':1050},accept_downloads=True)
+                page.goto(f'http://127.0.0.1:{server.server_port}/');page.locator('#doki-settings-tab').click();h=page.locator('#doki-controls')
+                self.assertTrue(page.evaluate("typeof ImageDecoder!=='undefined'"))
+                for name,fixture in fixtures.items():
+                    mime=fixture.get('mime',name)
+                    h.locator('#custom-create').click();h.locator('#custom-name').fill(name)
+                    h.locator('#custom-background').fill('#101820')
+                    h.locator('#custom-image').set_input_files({'name':'accent.'+mime.split('/')[1],'mimeType':mime,'buffer':base64.b64decode(fixture['data'])})
+                    expect(h.locator('#custom-save')).to_be_enabled()
+                    accent=h.locator('#custom-accent').input_value()
+                    for actual,expected in zip([int(accent[i:i+2],16) for i in (1,3,5)],[215,75,105]):self.assertLessEqual(abs(actual-expected),3)
+                    h.locator('#custom-save').click();expect(h.locator('#custom-dialog')).not_to_be_visible()
+                    with page.expect_download() as dl:h.locator('#custom-export').click()
+                    payload=json.loads(Path(dl.value.path()).read_text());payload['theme']['name']='Imported '+name
+                    payload['theme']['colors']['accent']='#123456'
+                    h.locator('#custom-import-file').set_input_files({'name':'accent.json','mimeType':'application/json','buffer':json.dumps(payload).encode()})
+                    expect(h.locator('#theme-name')).to_have_text(payload['theme']['name'])
+                    with page.expect_download() as imported_dl:h.locator('#custom-export').click()
+                    self.assertEqual(json.loads(Path(imported_dl.value.path()).read_text())['theme']['colors']['accent'],accent)
+                    h.locator('#custom-edit').click();expect(h.locator('#custom-save')).to_be_enabled()
+                    self.assertEqual(h.locator('#custom-accent').input_value(),accent)
+                    h.locator('#custom-accent').fill('#35b18d');expect(h.locator('#custom-auto-accent')).not_to_be_checked()
+                    h.locator('#custom-auto-accent').check();self.assertEqual(h.locator('#custom-accent').input_value(),accent)
+                    h.locator('#custom-cancel').click()
+                browser.close()
+        finally:server.shutdown();server.server_close()
+
     def test_delete_old_theme_from_gallery_without_changing_current_theme(self):
         server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
         threading.Thread(target=server.serve_forever,daemon=True).start()

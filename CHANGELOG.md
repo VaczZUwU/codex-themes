@@ -4,6 +4,7 @@
 
 - Rename the repository to `codex-themes`; retain existing profile and launcher names for compatibility.
 - Check public GitHub releases at startup, display a localized notification/settings status, and link to manual installation. Offline startup remains available.
+- Sample several animation frames for automatic accents, including animations with a transparent first frame; recalculate automatic accents on JSON import.
 - Support animated GIF, WebP and PNG wallpapers in custom themes, including previews, JSON import/export and restart persistence. Preserve animation bytes instead of flattening them during static optimization.
 - Confirm deletion in a themed in-app dialog above the gallery, without native browser prompts or their blocking setting.
 - Delete older custom themes directly from preview cards with named confirmation; preserve the current appearance when removing an inactive theme.
