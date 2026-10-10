@@ -46,3 +46,5 @@ The release should remain an experimental prerelease while this final installati
 - Animated background tests use synthetic two-frame looping GIF, WebP and APNG fixtures wider than the optimization threshold. Upload, export/import, editing and full Chromium restarts preserve every original byte with optimization enabled.
 
 - Gallery deletion tests verify cancellation, absence of deletion controls on built-in themes, preserving the active theme when deleting an old theme, Russian button labels, selected-theme deactivation and durable deletion after full Chromium restarts.
+
+- In-app deletion confirmation is tested with native `window.confirm` blocked: Cancel and Escape preserve the theme and gallery, and the explicit Delete button removes it.

@@ -147,6 +147,7 @@
     .variant-count{display:block;margin-top:7px;font-size:10px;font-weight:400;color:var(--color-text-secondary)}
     #artwork-dialog{width:min(480px,calc(100vw - 48px))}#artwork-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:20px}#artwork-gallery.single{grid-template-columns:1fr}#artwork-gallery .thumbnail{height:150px}
     @media(max-width:600px){.range{width:150px}input[type=range]{width:105px}.row{gap:10px}.previews{gap:10px}.preview{height:115px}#gallery{grid-template-columns:repeat(2,minmax(0,1fr))}select{max-width:160px}}
+    #delete-dialog{width:min(420px,calc(100vw - 48px));padding:24px}#delete-title{margin:0 0 14px;font-size:18px}#delete-name{font-weight:600;overflow-wrap:anywhere}#delete-dialog .custom-actions{justify-content:flex-end;padding-bottom:0}
     #custom-dialog{width:min(540px,calc(100vw - 48px));max-height:85vh;overflow:auto}#custom-form{padding:20px}#custom-form .row{gap:12px}#custom-name{width:240px;max-width:60%;background:var(--color-surface-secondary);border:1px solid var(--color-border);border-radius:8px;padding:8px}input[type=color]{width:44px;height:30px;border:1px solid var(--color-border);border-radius:6px;background:transparent;padding:2px;cursor:pointer}.custom-actions{display:flex;gap:8px;flex-wrap:wrap;padding:12px 0}.custom-actions .chip{font-size:12px}#custom-preview{height:150px;border-radius:10px;background-size:cover;background-position:right center;border:1px solid var(--color-border);padding:16px}#custom-hint,#custom-error{font-size:12px;line-height:1.5}#custom-error{min-height:18px;color:var(--color-text)}.chip:disabled{opacity:.5;cursor:default}
   </style><section id="panel" aria-label="Doki Theme">
     <h2 data-i18n="visualStyle"></h2>
@@ -168,6 +169,7 @@
   </section><button id="toggle">Doki</button>
   <dialog id="theme-dialog" aria-labelledby="gallery-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="gallery-title" data-i18n="chooseTheme"></h3><button id="close-gallery" type="button" aria-label="Close">×</button></div><input id="search" type="search" placeholder="Senko, Rem, Fate…"></div><p id="gallery-error" role="alert"></p><div id="gallery"></div></dialog>
   <dialog id="artwork-dialog" aria-labelledby="artwork-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="artwork-title" data-i18n="variant"></h3><button id="close-artwork" type="button" aria-label="Close">×</button></div></div><div id="artwork-gallery"></div></dialog>
+  <dialog id="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-description delete-name"><h3 id="delete-title" data-i18n="deleteTheme"></h3><p id="delete-description" data-i18n="deleteConfirm"></p><p id="delete-name"></p><div class="custom-actions"><button type="button" class="chip" id="delete-cancel" data-i18n="cancel"></button><button type="button" class="chip" id="delete-confirm" data-i18n="deleteTheme"></button></div></dialog>
   <dialog id="custom-dialog" aria-labelledby="custom-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="custom-title"></h3><button type="button" id="custom-close" class="chip">×</button></div></div><form id="custom-form"><div class="row"><label for="custom-name" data-i18n="themeName"></label><input id="custom-name" required></div><div class="row"><label for="custom-background" data-i18n="backgroundColor"></label><input id="custom-background" type="color"></div><div class="row"><label for="custom-foreground" data-i18n="textColor"></label><input id="custom-foreground" type="color"></div><div class="row"><label for="custom-accent" data-i18n="accentColor"></label><input id="custom-accent" type="color"></div><div class="row"><label for="custom-auto-accent" data-i18n="autoAccent"></label><input id="custom-auto-accent" type="checkbox" role="switch"></div><div class="row"><label for="custom-optimize" data-i18n="optimizeWallpaper"></label><input id="custom-optimize" type="checkbox" role="switch"></div><div id="custom-preview"></div><p id="custom-image-info" role="status"></p><div class="custom-actions"><button type="button" class="chip" id="custom-upload" data-i18n="uploadWallpaper"></button><button type="button" class="chip" id="custom-remove" data-i18n="removeWallpaper"></button><input hidden id="custom-image" type="file" accept="image/png,image/jpeg,image/webp,image/gif"></div><p id="custom-hint" data-i18n="customHint"></p><p id="custom-error" role="alert"></p><div class="custom-actions"><button type="submit" class="chip" id="custom-save" data-i18n="saveTheme"></button><button type="button" class="chip" id="custom-cancel" data-i18n="cancel"></button></div></form></dialog>`;
   const $ = id => shadow.getElementById(id);
   function current() { return themes.find(t => t.name === settings.theme) || themes.find(t => t.name === 'Senko') || themes[0]; }
@@ -429,14 +431,22 @@
     settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();await selectionWrite;$('custom-dialog').close();$('theme-picker').focus();$('status').textContent=tr('customSaved');
   },$('custom-error'));};
   function deleteCustom(t,errorElement=$('status')){
-    if(customBusy||!t.custom||!confirm(`${tr('deleteConfirm')}\n${t.name}`))return;
+    if(customBusy||!t.custom)return;
     customOperation(async()=>{
+      const dialog=$('delete-dialog');$('delete-name').textContent=t.name;dialog.returnValue='';
+      const confirmed=await new Promise(resolve=>{
+        dialog.addEventListener('close',()=>resolve(dialog.returnValue==='delete'),{once:true});
+        dialog.showModal();$('delete-cancel').focus();
+      });
+      if(!confirmed)return;
       const selected=settings.theme===t.name;
       await storeCustom(themes.filter(x=>x.custom&&x!==t));
       if(selected)deactivateDoki();populate();apply();await selectionWrite;renderGallery();
       if($('theme-dialog').open)$('search').focus();
     },errorElement);
   }
+  $('delete-cancel').onclick=()=>$('delete-dialog').close('cancel');
+  $('delete-confirm').onclick=()=>$('delete-dialog').close('delete');
   $('custom-delete').onclick=()=>deleteCustom(current());
   $('custom-export').onclick=()=>{if(!current().custom)return;const t=current(),blob=new Blob([JSON.stringify({format:'codex-doki-theme',version:1,theme:portable(t)},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=t.name.replace(/[^a-z0-9_-]/gi,'_')+'.json';shadow.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);};
   $('custom-import').onclick=()=>{$('custom-import-file').value='';$('custom-import-file').click();};
