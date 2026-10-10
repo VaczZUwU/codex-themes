@@ -5,7 +5,7 @@
 | Platform | Windows x64 |
 | Codex Store package | 26.1002.7124.0 |
 | Codex internal AppVersion | 26.1002.52244 |
-| Doki Theme extension | 88.1.18 |
+| Bundled Doki catalog | Derived from 88.1.18; VS Code not required |
 | Theme catalog | 88 themes / 103 artwork files |
 | UI locale catalog | 64 native translations + English |
 | Installer | Python 3.10+ standard library |
@@ -32,13 +32,14 @@ does not bypass structural or archive integrity validation.
 **Codex not found:** install the Windows app, or pass `--codex-path` to the `app` directory containing
 `ChatGPT.exe` and `resources/app.asar`.
 
-**Doki not found:** install Doki Theme in VS Code/VS Code Insiders, or provide `--extension-path`.
+**Theme catalog missing:** extract the complete release ZIP, including `src/themes.json`.
+VS Code is not needed. `--extension-path` only overrides the bundled catalog when explicitly supplied.
 
 **Unsupported layout or locale:** use an original installation matching the compatibility table.
 Do not disable integrity/CSP checks to work around this error.
 
 **Download error:** retry with internet access to Doki's asset server. `--offline` requires all original
-wallpaper PNGs in the existing Doki cache. Use `--cache-path` if it is stored elsewhere.
+wallpaper PNGs in `%LOCALAPPDATA%\CodexDokiCache\backgrounds`. Use `--cache-path` if it is stored elsewhere.
 
 **Existing destination:** the installer refuses to overwrite it. Close the Doki copy and uninstall it,
 or choose a different `--install-dir`.

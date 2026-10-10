@@ -1,10 +1,11 @@
-# Local validation — 0.1.0 candidate
+# Local validation — 0.1.1 candidate
 
 Validated on Windows, 2026-10-10:
 
-- 8 Python installer tests passed: packed archive replacement, existing entry preservation,
+- 10 Python installer tests passed: packed archive replacement, existing entry preservation,
   SHA-256 integrity, malformed archives, path traversal, offline asset behavior,
-  synthetic installation/removal and removal guards.
+  synthetic installation/removal and removal guards, the bundled catalog without VS Code,
+  and automatic artwork caching for offline reuse.
 - JavaScript syntax check passed.
 - Automatic discovery and compatibility check passed against the installed Codex and Doki versions
   in the compatibility table: 88 themes, 103 images, 65 interface locales.
@@ -22,5 +23,5 @@ Validated on Windows, 2026-10-10:
 cycle on a machine with sufficient free space. This cycle could not be completed locally because a second
 runtime copy would exceed available disk space. The original Codex installation remained unchanged.
 
-CI workflows are supplied but have not run on GitHub until the repository is pushed.
+GitHub CI checks run on Windows and Linux when changes are pushed.
 The release should remain an experimental prerelease while this final installation check is pending.

@@ -16,7 +16,7 @@ import time
 import urllib.parse
 import urllib.request
 
-VERSION = '0.1.0'
+VERSION = '0.1.1'
 TESTED_CODEX = '26.1002.52244'
 TESTED_DOKI = '88.1.18'
 BASE = Path(__file__).resolve().parent
@@ -110,21 +110,6 @@ def detect_codex():
     return Path(data) / 'app'
 
 
-def detect_extension():
-    candidates = []
-    for root in (Path.home()/'.vscode/extensions', Path.home()/'.vscode-insiders/extensions'):
-        for folder in root.glob('unthrottled.doki-theme-*'):
-            try:
-                package = json.loads((folder/'package.json').read_text(encoding='utf8'))
-                version = tuple(int(x) for x in package['version'].split('.'))
-                candidates.append((version, folder))
-            except (OSError, ValueError, KeyError):
-                continue
-    if not candidates:
-        raise ValueError('Install unthrottled.doki-theme in VS Code, or pass --extension-path PATH.')
-    return max(candidates)[1]
-
-
 def safe_asset(name):
     if not re.fullmatch(r'[A-Za-z0-9_.-]+\.png', name) or '..' in name:
         raise ValueError(f'Unsupported image filename: {name}')
@@ -193,8 +178,26 @@ def extract_locales(archive):
     return catalog
 
 
-def prepare(source, extension, allow_unsupported=False):
-    source, extension = source.resolve(), extension.resolve()
+def load_bundled_themes():
+    themes = json.loads((BASE/'src/themes.json').read_text(encoding='utf8'))
+    if not isinstance(themes, list) or not themes:
+        raise ValueError('Bundled theme catalog is empty')
+    names = set()
+    for theme in themes:
+        if theme['name'] in names or not isinstance(theme['dark'], bool) or not theme['images']:
+            raise ValueError('Invalid bundled theme definition')
+        names.add(theme['name'])
+        if not all(re.fullmatch(r'#[0-9a-fA-F]{6}', theme['colors'][key]) for key in ('background', 'foreground', 'accent')):
+            raise ValueError('Invalid bundled theme palette')
+        for image in theme['images']:
+            safe_asset(image['file'])
+            if not 0 <= image['readingOpacity'] <= 1 or image['anchor'] not in ('left', 'right', 'center'):
+                raise ValueError('Invalid bundled artwork metadata')
+    return themes, TESTED_DOKI
+
+
+def prepare(source, extension=None, allow_unsupported=False):
+    source = source.resolve()
     archive = source/'resources/app.asar'
     tree, header, base = read_header(archive)
     html = read_entry(archive, tree, base, 'webview/index.html').decode('utf8')
@@ -207,7 +210,7 @@ def prepare(source, extension, allow_unsupported=False):
     config.optionxform = str
     config.read(source/'resources/owl-app.ini', encoding='utf8')
     version = config['Owl']['AppVersion']
-    themes, doki_version = load_themes(extension)
+    themes, doki_version = load_themes(extension.resolve()) if extension else load_bundled_themes()
     if not allow_unsupported and (version != TESTED_CODEX or doki_version != TESTED_DOKI):
         raise ValueError(f'Untested versions: Codex {version}, Doki {doki_version}. '
                          'See docs/COMPATIBILITY.md. --allow-unsupported opts into testing this combination.')
@@ -233,6 +236,8 @@ def obtain_asset(name, cache, offline):
                 data = response.read(32 * 1024 * 1024 + 1)
             if not data.startswith(PNG) or len(data) > 32 * 1024 * 1024:
                 raise ValueError(f'Invalid artwork: {name}')
+            cached.parent.mkdir(parents=True, exist_ok=True)
+            cached.write_bytes(data)
             return name, data
         except Exception:
             if attempt == 2:
@@ -310,9 +315,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('command', choices=['check', 'install', 'uninstall'], nargs='?', default='install')
     parser.add_argument('--codex-path', type=Path, help='Original Codex app directory containing ChatGPT.exe')
-    parser.add_argument('--extension-path', type=Path, help='Installed unthrottled.doki-theme extension directory')
+    parser.add_argument('--extension-path', type=Path, help='Optional custom Doki extension directory; default uses bundled themes')
     parser.add_argument('--install-dir', type=Path, default=Path(os.environ.get('LOCALAPPDATA', Path.home()))/'CodexDoki')
-    parser.add_argument('--cache-path', type=Path, default=Path(os.environ.get('APPDATA', Path.home()))/'Code/User/globalStorage/unthrottled.doki-theme')
+    parser.add_argument('--cache-path', type=Path, default=Path(os.environ.get('LOCALAPPDATA', Path.home()))/'CodexDokiCache')
     parser.add_argument('--offline', action='store_true', help='Use cached artwork only; never contact CDN')
     parser.add_argument('--allow-unsupported', action='store_true', help='Opt into testing a different application/extension version')
     args = parser.parse_args()
@@ -321,7 +326,7 @@ def main():
     if args.command == 'uninstall':
         uninstall(args.install_dir)
         return
-    prepared = prepare(args.codex_path or detect_codex(), args.extension_path or detect_extension(), args.allow_unsupported)
+    prepared = prepare(args.codex_path or detect_codex(), args.extension_path, args.allow_unsupported)
     print(f"Compatible layout: Codex {prepared['codexVersion']}, Doki {prepared['dokiVersion']}; "
           f"{len(prepared['themes'])} themes, {len(prepared['locales'])+1} languages.")
     if args.command == 'check':

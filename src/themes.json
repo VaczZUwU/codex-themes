@@ -1,0 +1,1676 @@
+[
+  {
+    "name": "Essex",
+    "group": "Azur Lane",
+    "dark": true,
+    "colors": {
+      "background": "#001d39",
+      "foreground": "#F8F8F2",
+      "accent": "#163756"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "essex_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.1
+      },
+      {
+        "variant": "secondary",
+        "file": "essex_dark_plain.png",
+        "anchor": "right",
+        "readingOpacity": 0.1
+      }
+    ]
+  },
+  {
+    "name": "Maika",
+    "group": "Blend S",
+    "dark": true,
+    "colors": {
+      "background": "#24062f",
+      "foreground": "#F8F8F2",
+      "accent": "#2e1738"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "maika_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Mai Dark",
+    "group": "Bunny Senpai",
+    "dark": true,
+    "colors": {
+      "background": "#242448",
+      "foreground": "#F8F8F2",
+      "accent": "#2f3357"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "mai_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.08
+      },
+      {
+        "variant": "secondary",
+        "file": "mai_dark_spicy.png",
+        "anchor": "right",
+        "readingOpacity": 0.1
+      }
+    ]
+  },
+  {
+    "name": "Mai Light",
+    "group": "Bunny Senpai",
+    "dark": false,
+    "colors": {
+      "background": "#FAF2F1",
+      "foreground": "#4D4D4A",
+      "accent": "#d7dcf1"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "mai_light.png",
+        "anchor": "right",
+        "readingOpacity": 0.1
+      },
+      {
+        "variant": "secondary",
+        "file": "mai_light_spicy.png",
+        "anchor": "right",
+        "readingOpacity": 0.13
+      }
+    ]
+  },
+  {
+    "name": "Tomori Nao",
+    "group": "Charlotte",
+    "dark": false,
+    "colors": {
+      "background": "#efe7de",
+      "foreground": "#4D4D4A",
+      "accent": "#efe6df"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "nao_light.png",
+        "anchor": "right",
+        "readingOpacity": 0.15
+      }
+    ]
+  },
+  {
+    "name": "Takanashi Rikka",
+    "group": "Chuunibyou",
+    "dark": true,
+    "colors": {
+      "background": "#1e1928",
+      "foreground": "#F8F8F2",
+      "accent": "#492f41"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "rikka_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.12
+      }
+    ]
+  },
+  {
+    "name": "C.C.",
+    "group": "Code Geass",
+    "dark": false,
+    "colors": {
+      "background": "#C4EA8A",
+      "foreground": "#4D4D4A",
+      "accent": "#e0ffb4"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "cc_light.png",
+        "anchor": "right",
+        "readingOpacity": 0.13
+      }
+    ]
+  },
+  {
+    "name": "Miia",
+    "group": "Daily Life With A Monster Girl",
+    "dark": true,
+    "colors": {
+      "background": "#310e19",
+      "foreground": "#F8F8F2",
+      "accent": "#541827"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "miia_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.06
+      }
+    ]
+  },
+  {
+    "name": "Mioda Ibuki Dark",
+    "group": "DanganRonpa",
+    "dark": true,
+    "colors": {
+      "background": "#191b1d",
+      "foreground": "#F8F8F2",
+      "accent": "#262c32"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "ibuki_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Mioda Ibuki Light",
+    "group": "DanganRonpa",
+    "dark": false,
+    "colors": {
+      "background": "#ffeefd",
+      "foreground": "#4D4D4A",
+      "accent": "#F7E0F3"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "ibuki_light.png",
+        "anchor": "right",
+        "readingOpacity": 0.05
+      }
+    ]
+  },
+  {
+    "name": "Hiro",
+    "group": "Darling in the Franxx",
+    "dark": true,
+    "colors": {
+      "background": "#16171A",
+      "foreground": "#F8F8F2",
+      "accent": "#393c45"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "hiro_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.09
+      }
+    ]
+  },
+  {
+    "name": "Hiro x Zero Two",
+    "group": "Darling in the Franxx",
+    "dark": true,
+    "colors": {
+      "background": "#150b24",
+      "foreground": "#F8F8F2",
+      "accent": "#372c40"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "hiro_x_zero_two.png",
+        "anchor": "center",
+        "readingOpacity": 0.13
+      }
+    ]
+  },
+  {
+    "name": "Zero Two Dark Obsidian",
+    "group": "Darling in the Franxx",
+    "dark": true,
+    "colors": {
+      "background": "#17070e",
+      "foreground": "#F8F8F2",
+      "accent": "#29312b"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "zero_two_obsidian.png",
+        "anchor": "center",
+        "readingOpacity": 0.13
+      }
+    ]
+  },
+  {
+    "name": "Zero Two Dark Rose",
+    "group": "Darling in the Franxx",
+    "dark": true,
+    "colors": {
+      "background": "#310f0f",
+      "foreground": "#F8F8F2",
+      "accent": "#541819"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "zero_two_rose.png",
+        "anchor": "center",
+        "readingOpacity": 0.08
+      }
+    ]
+  },
+  {
+    "name": "Zero Two Light Lily",
+    "group": "Darling in the Franxx",
+    "dark": false,
+    "colors": {
+      "background": "#fcfcfc",
+      "foreground": "#4D4D4A",
+      "accent": "#f0f0f0"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "zero_two_lily.png",
+        "anchor": "center",
+        "readingOpacity": 0.2
+      }
+    ]
+  },
+  {
+    "name": "Zero Two Light Sakura",
+    "group": "Darling in the Franxx",
+    "dark": false,
+    "colors": {
+      "background": "#ffe6ee",
+      "foreground": "#4D4D4A",
+      "accent": "#ffd1e2"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "zero_two_sakura.png",
+        "anchor": "center",
+        "readingOpacity": 0.13
+      }
+    ]
+  },
+  {
+    "name": "Hayase Nagatoro",
+    "group": "Don't Toy with me Miss Nagatoro",
+    "dark": true,
+    "colors": {
+      "background": "#151515",
+      "foreground": "#F8F8F2",
+      "accent": "#2e2c2b"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "nagatoro_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.09
+      }
+    ]
+  },
+  {
+    "name": "Sagiri",
+    "group": "EroManga Sensei",
+    "dark": true,
+    "colors": {
+      "background": "#0a3b36",
+      "foreground": "#F8F8F2",
+      "accent": "#135e57"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "sagiri_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.1
+      }
+    ]
+  },
+  {
+    "name": "Katsuragi Misato",
+    "group": "Evangelion",
+    "dark": true,
+    "colors": {
+      "background": "#382536",
+      "foreground": "#F8F8F2",
+      "accent": "#341F2D"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "misato_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Rei",
+    "group": "Evangelion",
+    "dark": true,
+    "colors": {
+      "background": "#191b1f",
+      "foreground": "#F8F8F2",
+      "accent": "#212122"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "rei_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Astolfo",
+    "group": "Fate",
+    "dark": true,
+    "colors": {
+      "background": "#1a1c19",
+      "foreground": "#F8F8F2",
+      "accent": "#242422"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "astolfo_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Ishtar Dark",
+    "group": "Fate",
+    "dark": true,
+    "colors": {
+      "background": "#110F10",
+      "foreground": "#F8F8F2",
+      "accent": "#221d1b"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "ishtar_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Ishtar Light",
+    "group": "Fate",
+    "dark": false,
+    "colors": {
+      "background": "#fffefb",
+      "foreground": "#4D4D4A",
+      "accent": "#fffef7"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "ishtar_light.png",
+        "anchor": "center",
+        "readingOpacity": 0.1
+      }
+    ]
+  },
+  {
+    "name": "Tohsaka Rin",
+    "group": "Fate",
+    "dark": true,
+    "colors": {
+      "background": "#161415",
+      "foreground": "#F8F8F2",
+      "accent": "#232121"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "rin_dark_v2.png",
+        "anchor": "right",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Gasai Yuno",
+    "group": "Future Diary",
+    "dark": true,
+    "colors": {
+      "background": "#150713",
+      "foreground": "#F8F8F2",
+      "accent": "#37223a"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "yuno_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.08
+      }
+    ]
+  },
+  {
+    "name": "Rory Mercury",
+    "group": "Gate",
+    "dark": true,
+    "colors": {
+      "background": "#141417",
+      "foreground": "#F8F8F2",
+      "accent": "#1f1a1a"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "rory_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Yuzuriha Inori",
+    "group": "Guilty Crown",
+    "dark": false,
+    "colors": {
+      "background": "#FFA772",
+      "foreground": "#4D4D4A",
+      "accent": "#fdbf92"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "inori_light.png",
+        "anchor": "right",
+        "readingOpacity": 0.11
+      }
+    ]
+  },
+  {
+    "name": "Hinata Shoyo",
+    "group": "Haikyu!!",
+    "dark": true,
+    "colors": {
+      "background": "#201c37",
+      "foreground": "#F8F8F2",
+      "accent": "#3b4060"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "shoyo_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.12
+      }
+    ]
+  },
+  {
+    "name": "Senko",
+    "group": "Helpful Fox Senko-san",
+    "dark": false,
+    "colors": {
+      "background": "#FFE7CD",
+      "foreground": "#4D4D4A",
+      "accent": "#f3d9bc"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "senko_light.png",
+        "anchor": "right",
+        "readingOpacity": 0.11
+      }
+    ]
+  },
+  {
+    "name": "Rias: Crimson",
+    "group": "High School DxD",
+    "dark": true,
+    "colors": {
+      "background": "#3E1010",
+      "foreground": "#F8F8F2",
+      "accent": "#611c1c"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "rias_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Rias: Onyx",
+    "group": "High School DxD",
+    "dark": true,
+    "colors": {
+      "background": "#100000",
+      "foreground": "#F8F8F2",
+      "accent": "#2b0808"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "rias_onyx.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      },
+      {
+        "variant": "secondary",
+        "file": "rias_onyx_spicy.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Jabami Yumeko",
+    "group": "Kakegurui",
+    "dark": true,
+    "colors": {
+      "background": "#050000",
+      "foreground": "#F8F8F2",
+      "accent": "#2b0808"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "yumeko_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.08
+      }
+    ]
+  },
+  {
+    "name": "Ryuko Dark",
+    "group": "Kill la Kill",
+    "dark": true,
+    "colors": {
+      "background": "#2b3238",
+      "foreground": "#F8F8F2",
+      "accent": "#2b3237"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "ryuko.png",
+        "anchor": "right",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Ryuko Light",
+    "group": "Kill la Kill",
+    "dark": false,
+    "colors": {
+      "background": "#ffffff",
+      "foreground": "#4D4D4A",
+      "accent": "#aaddfd"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "ryuko_light.png",
+        "anchor": "right",
+        "readingOpacity": 0.13
+      }
+    ]
+  },
+  {
+    "name": "Satsuki Dark",
+    "group": "Kill la Kill",
+    "dark": true,
+    "colors": {
+      "background": "#242729",
+      "foreground": "#F8F8F2",
+      "accent": "#303537"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "satsuki_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.1
+      }
+    ]
+  },
+  {
+    "name": "Satsuki Light",
+    "group": "Kill la Kill",
+    "dark": false,
+    "colors": {
+      "background": "#ffffff",
+      "foreground": "#4D4D4A",
+      "accent": "#add3fd"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "satsuki_light.png",
+        "anchor": "center",
+        "readingOpacity": 0.13
+      }
+    ]
+  },
+  {
+    "name": "Aqua",
+    "group": "KonoSuba",
+    "dark": true,
+    "colors": {
+      "background": "#262940",
+      "foreground": "#F8F8F2",
+      "accent": "#31374b"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "aqua_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Darkness Dark",
+    "group": "KonoSuba",
+    "dark": true,
+    "colors": {
+      "background": "#0a0904",
+      "foreground": "#F8F8F2",
+      "accent": "#1e1c19"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "darkness_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Darkness Light",
+    "group": "KonoSuba",
+    "dark": false,
+    "colors": {
+      "background": "#FFFEF9",
+      "foreground": "#4D4D4A",
+      "accent": "#fffef7"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "darkness_light.png",
+        "anchor": "center",
+        "readingOpacity": 0.1
+      }
+    ]
+  },
+  {
+    "name": "Megumin",
+    "group": "KonoSuba",
+    "dark": true,
+    "colors": {
+      "background": "#2c2126",
+      "foreground": "#F8F8F2",
+      "accent": "#2f2329"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "megumin.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Monika Dark",
+    "group": "Literature Club",
+    "dark": true,
+    "colors": {
+      "background": "#1d2115",
+      "foreground": "#F8F8F2",
+      "accent": "#1e3219"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "just_monika_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      },
+      {
+        "variant": "secondary",
+        "file": "just_monika_dark_joy.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Monika Light",
+    "group": "Literature Club",
+    "dark": false,
+    "colors": {
+      "background": "#f2fff0",
+      "foreground": "#4D4D4A",
+      "accent": "#d8eed9"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "just_monika.png",
+        "anchor": "center",
+        "readingOpacity": 0.1
+      },
+      {
+        "variant": "secondary",
+        "file": "just_monika_joy.png",
+        "anchor": "center",
+        "readingOpacity": 0.1
+      }
+    ]
+  },
+  {
+    "name": "Natsuki Dark",
+    "group": "Literature Club",
+    "dark": true,
+    "colors": {
+      "background": "#35102c",
+      "foreground": "#F8F8F2",
+      "accent": "#561b3e"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "natsuki_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.08
+      },
+      {
+        "variant": "secondary",
+        "file": "natsuki_dark_normal.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Natsuki Light",
+    "group": "Literature Club",
+    "dark": false,
+    "colors": {
+      "background": "#FFE5F1",
+      "foreground": "#4D4D4A",
+      "accent": "#fdd0e4"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "natsuki.png",
+        "anchor": "right",
+        "readingOpacity": 0.15
+      },
+      {
+        "variant": "secondary",
+        "file": "natsuki_joy.png",
+        "anchor": "center",
+        "readingOpacity": 0.1
+      }
+    ]
+  },
+  {
+    "name": "Sayori Dark",
+    "group": "Literature Club",
+    "dark": true,
+    "colors": {
+      "background": "#111b2d",
+      "foreground": "#F8F8F2",
+      "accent": "#18303f"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "sayori_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      },
+      {
+        "variant": "secondary",
+        "file": "sayori_dark_normal.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Sayori Light",
+    "group": "Literature Club",
+    "dark": false,
+    "colors": {
+      "background": "#f0faff",
+      "foreground": "#4D4D4A",
+      "accent": "#d8e6ee"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "sayori.png",
+        "anchor": "center",
+        "readingOpacity": 0.1
+      },
+      {
+        "variant": "secondary",
+        "file": "sayori_joy.png",
+        "anchor": "center",
+        "readingOpacity": 0.1
+      }
+    ]
+  },
+  {
+    "name": "Yuri Dark",
+    "group": "Literature Club",
+    "dark": true,
+    "colors": {
+      "background": "#422D5A",
+      "foreground": "#F8F8F2",
+      "accent": "#483967"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "yuri_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      },
+      {
+        "variant": "secondary",
+        "file": "yuri_dark_normal.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Yuri Light",
+    "group": "Literature Club",
+    "dark": false,
+    "colors": {
+      "background": "#f3f0ff",
+      "foreground": "#4D4D4A",
+      "accent": "#e1d8ee"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "yuri.png",
+        "anchor": "center",
+        "readingOpacity": 0.06
+      },
+      {
+        "variant": "secondary",
+        "file": "yuri_joy.png",
+        "anchor": "center",
+        "readingOpacity": 0.06
+      }
+    ]
+  },
+  {
+    "name": "Sonoda Umi",
+    "group": "Love Live",
+    "dark": true,
+    "colors": {
+      "background": "#15173c",
+      "foreground": "#F8F8F2",
+      "accent": "#202440"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "umi_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Konata",
+    "group": "Lucky Star",
+    "dark": true,
+    "colors": {
+      "background": "#355082",
+      "foreground": "#F8F8F2",
+      "accent": "#4e608d"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "konata_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      },
+      {
+        "variant": "secondary",
+        "file": "konata_dark_secondary.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Kanna",
+    "group": "Miss Kobayashi's Dragon Maid",
+    "dark": true,
+    "colors": {
+      "background": "#1a1426",
+      "foreground": "#F8F8F2",
+      "accent": "#262732"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "kanna_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      },
+      {
+        "variant": "secondary",
+        "file": "kanna_dark_secondary.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Tohru",
+    "group": "Miss Kobayashi's Dragon Maid",
+    "dark": false,
+    "colors": {
+      "background": "#ffe090",
+      "foreground": "#4D4D4A",
+      "accent": "#ffce85"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "tohru_light.png",
+        "anchor": "right",
+        "readingOpacity": 0.2
+      }
+    ]
+  },
+  {
+    "name": "Hanekawa Tsubasa",
+    "group": "Monogatari",
+    "dark": true,
+    "colors": {
+      "background": "#100d11",
+      "foreground": "#F8F8F2",
+      "accent": "#2e2939"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "hanekawa_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Azuki",
+    "group": "NekoPara",
+    "dark": true,
+    "colors": {
+      "background": "#2e221f",
+      "foreground": "#F8F8F2",
+      "accent": "#48403d"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "azuki_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Chocola",
+    "group": "NekoPara",
+    "dark": true,
+    "colors": {
+      "background": "#2c2729",
+      "foreground": "#F8F8F2",
+      "accent": "#46393e"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "chocola_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.06
+      }
+    ]
+  },
+  {
+    "name": "Christmas Chocola",
+    "group": "NekoPara",
+    "dark": true,
+    "colors": {
+      "background": "#3a141d",
+      "foreground": "#F8F8F2",
+      "accent": "#541827"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "chocola_xmas.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Cinnamon",
+    "group": "NekoPara",
+    "dark": true,
+    "colors": {
+      "background": "#343277",
+      "foreground": "#F8F8F2",
+      "accent": "#4a4a8c"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "cinnamon_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.09
+      }
+    ]
+  },
+  {
+    "name": "Coconut",
+    "group": "NekoPara",
+    "dark": true,
+    "colors": {
+      "background": "#312b3a",
+      "foreground": "#F8F8F2",
+      "accent": "#3e3948"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "coconut_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.06
+      }
+    ]
+  },
+  {
+    "name": "Maple Dark",
+    "group": "NekoPara",
+    "dark": true,
+    "colors": {
+      "background": "#2d1d1d",
+      "foreground": "#F8F8F2",
+      "accent": "#422c2c"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "maple_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.05
+      }
+    ]
+  },
+  {
+    "name": "Maple Light",
+    "group": "NekoPara",
+    "dark": false,
+    "colors": {
+      "background": "#ffd091",
+      "foreground": "#4D4D4A",
+      "accent": "#eab184"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "maple_light.png",
+        "anchor": "right",
+        "readingOpacity": 0.17
+      }
+    ]
+  },
+  {
+    "name": "Shigure",
+    "group": "NekoPara",
+    "dark": false,
+    "colors": {
+      "background": "#e9e9ff",
+      "foreground": "#4D4D4A",
+      "accent": "#b1affc"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "shigure_light.png",
+        "anchor": "right",
+        "readingOpacity": 0.17
+      }
+    ]
+  },
+  {
+    "name": "Vanilla",
+    "group": "NekoPara",
+    "dark": true,
+    "colors": {
+      "background": "#2b2c3d",
+      "foreground": "#F8F8F2",
+      "accent": "#393c48"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "vanilla_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.06
+      }
+    ]
+  },
+  {
+    "name": "Genos",
+    "group": "One Punch Man",
+    "dark": true,
+    "colors": {
+      "background": "#313234",
+      "foreground": "#F8F8F2",
+      "accent": "#434247"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "genos_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.1
+      }
+    ]
+  },
+  {
+    "name": "Yukinoshita Yukino",
+    "group": "OreGairu",
+    "dark": true,
+    "colors": {
+      "background": "#1f2126",
+      "foreground": "#F8F8F2",
+      "accent": "#2f3136"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "yukino_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Kirino",
+    "group": "OreImo",
+    "dark": true,
+    "colors": {
+      "background": "#121e1c",
+      "foreground": "#F8F8F2",
+      "accent": "#253e3a"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "kirino_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.1
+      }
+    ]
+  },
+  {
+    "name": "Nakano Ichika",
+    "group": "Quintessential Quintuplets",
+    "dark": false,
+    "colors": {
+      "background": "#E3CCFD",
+      "foreground": "#4D4D4A",
+      "accent": "#ebdaff"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "ichika_light.png",
+        "anchor": "right",
+        "readingOpacity": 0.13
+      }
+    ]
+  },
+  {
+    "name": "Nakano Itsuki",
+    "group": "Quintessential Quintuplets",
+    "dark": false,
+    "colors": {
+      "background": "#FFBEBE",
+      "foreground": "#4D4D4A",
+      "accent": "#ffb7b4"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "itsuki_light.png",
+        "anchor": "right",
+        "readingOpacity": 0.08
+      }
+    ]
+  },
+  {
+    "name": "Nakano Miku",
+    "group": "Quintessential Quintuplets",
+    "dark": true,
+    "colors": {
+      "background": "#244158",
+      "foreground": "#F8F8F2",
+      "accent": "#27575d"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "nakano_miku_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.06
+      }
+    ]
+  },
+  {
+    "name": "Nakano Nino",
+    "group": "Quintessential Quintuplets",
+    "dark": true,
+    "colors": {
+      "background": "#1c191d",
+      "foreground": "#F8F8F2",
+      "accent": "#2d2330"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "nino_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.06
+      }
+    ]
+  },
+  {
+    "name": "Nakano Yotsuba",
+    "group": "Quintessential Quintuplets",
+    "dark": true,
+    "colors": {
+      "background": "#200909",
+      "foreground": "#F8F8F2",
+      "accent": "#2d2330"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "yotsuba_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.11
+      }
+    ]
+  },
+  {
+    "name": "Beatrice",
+    "group": "Re Zero",
+    "dark": false,
+    "colors": {
+      "background": "#FFE5F1",
+      "foreground": "#4D4D4A",
+      "accent": "#fdd0e4"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "beatrice.png",
+        "anchor": "right",
+        "readingOpacity": 0.1
+      }
+    ]
+  },
+  {
+    "name": "Echidna",
+    "group": "Re Zero",
+    "dark": true,
+    "colors": {
+      "background": "#121014",
+      "foreground": "#F8F8F2",
+      "accent": "#212425"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "echidna_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Emilia Dark",
+    "group": "Re Zero",
+    "dark": true,
+    "colors": {
+      "background": "#492d5a",
+      "foreground": "#F8F8F2",
+      "accent": "#553967"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "emilia_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.13
+      }
+    ]
+  },
+  {
+    "name": "Emilia Light",
+    "group": "Re Zero",
+    "dark": false,
+    "colors": {
+      "background": "#fbf0ff",
+      "foreground": "#4D4D4A",
+      "accent": "#e7d8ee"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "emilia_light.png",
+        "anchor": "right",
+        "readingOpacity": 0.1
+      }
+    ]
+  },
+  {
+    "name": "Ram",
+    "group": "Re Zero",
+    "dark": true,
+    "colors": {
+      "background": "#342c34",
+      "foreground": "#F8F8F2",
+      "accent": "#373237"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "ram.png",
+        "anchor": "right",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Rem",
+    "group": "Re Zero",
+    "dark": true,
+    "colors": {
+      "background": "#2c2d34",
+      "foreground": "#F8F8F2",
+      "accent": "#323337"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "rem.png",
+        "anchor": "right",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Yukihira Soma",
+    "group": "Shokugeki no Soma",
+    "dark": true,
+    "colors": {
+      "background": "#09192b",
+      "foreground": "#F8F8F2",
+      "accent": "#293b54"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "soma_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.12
+      }
+    ]
+  },
+  {
+    "name": "Makise Kurisu",
+    "group": "Steins Gate",
+    "dark": true,
+    "colors": {
+      "background": "#170a0b",
+      "foreground": "#F8F8F2",
+      "accent": "#241919"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "kurisu_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.08
+      }
+    ]
+  },
+  {
+    "name": "Asuna Dark",
+    "group": "Sword Art Online",
+    "dark": true,
+    "colors": {
+      "background": "#1b1b1b",
+      "foreground": "#F8F8F2",
+      "accent": "#272524"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "asuna_dark.png",
+        "anchor": "center",
+        "readingOpacity": 0.09
+      }
+    ]
+  },
+  {
+    "name": "Asuna Light",
+    "group": "Sword Art Online",
+    "dark": false,
+    "colors": {
+      "background": "#fcfcfc",
+      "foreground": "#4D4D4A",
+      "accent": "#f9f2f2"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "asuna_light.png",
+        "anchor": "center",
+        "readingOpacity": 0.1
+      }
+    ]
+  },
+  {
+    "name": "Rimuru Tempest",
+    "group": "That Time I Get ReIncarnated As A Slime",
+    "dark": true,
+    "colors": {
+      "background": "#1c171d",
+      "foreground": "#F8F8F2",
+      "accent": "#433f46"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "rimuru_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.12
+      }
+    ]
+  },
+  {
+    "name": "Jahy",
+    "group": "The Great Jahy Will Not Be Defeated",
+    "dark": true,
+    "colors": {
+      "background": "#1b102e",
+      "foreground": "#F8F8F2",
+      "accent": "#352544"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "jahy_dark_smol.png",
+        "anchor": "right",
+        "readingOpacity": 0.09
+      }
+    ]
+  },
+  {
+    "name": "Raphtalia",
+    "group": "The Rising of Shield Hero",
+    "dark": true,
+    "colors": {
+      "background": "#1e1710",
+      "foreground": "#F8F8F2",
+      "accent": "#3d3328"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "raphtalia_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.11
+      }
+    ]
+  },
+  {
+    "name": "Misaka Mikoto",
+    "group": "Toaru Majutsu no Index",
+    "dark": true,
+    "colors": {
+      "background": "#0b173a",
+      "foreground": "#F8F8F2",
+      "accent": "#28325a"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "mikoto_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.11
+      }
+    ]
+  },
+  {
+    "name": "Gray",
+    "group": "Type-Moon",
+    "dark": true,
+    "colors": {
+      "background": "#35393b",
+      "foreground": "#F8F8F2",
+      "accent": "#414648"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "gray_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.06
+      }
+    ]
+  },
+  {
+    "name": "Hatsune Miku",
+    "group": "Vocaloid",
+    "dark": true,
+    "colors": {
+      "background": "#2f3635",
+      "foreground": "#F8F8F2",
+      "accent": "#323737"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "miku.png",
+        "anchor": "center",
+        "readingOpacity": 0.07
+      },
+      {
+        "variant": "secondary",
+        "file": "miku_secondary.png",
+        "anchor": "right",
+        "readingOpacity": 0.07
+      }
+    ]
+  },
+  {
+    "name": "Nadeshiko",
+    "group": "Yuru Camp",
+    "dark": true,
+    "colors": {
+      "background": "#2c1f26",
+      "foreground": "#F8F8F2",
+      "accent": "#483a47"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "nadeshiko_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.12
+      }
+    ]
+  },
+  {
+    "name": "Shima Rin",
+    "group": "Yuru Camp",
+    "dark": true,
+    "colors": {
+      "background": "#2b303b",
+      "foreground": "#F8F8F2",
+      "accent": "#3a4148"
+    },
+    "images": [
+      {
+        "variant": "default",
+        "file": "shima_rin_dark.png",
+        "anchor": "right",
+        "readingOpacity": 0.07
+      }
+    ]
+  }
+]

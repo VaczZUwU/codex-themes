@@ -10,6 +10,10 @@ Choose a theme from a searchable preview gallery inside **Settings → Appearanc
 The interface follows your Codex language. These screenshots show the **English** interface.
 For Russian screenshots, see the [Russian instructions](README.ru.md#скриншоты).
 
+**New chat — Takanashi Rikka**
+
+![Empty new-chat screen in English](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/home-en.png)
+
 **Appearance settings**
 
 ![Doki settings in English](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/settings-en.png)
@@ -40,16 +44,17 @@ Requirements:
    (Store package **26.1002.7124.0**).
 2. **Python 3.10 or newer**, installed from [python.org](https://www.python.org/downloads/windows/).
    Enable the Python launcher or add Python to PATH.
-3. [Doki Theme for VS Code](https://marketplace.visualstudio.com/items?itemName=unthrottled.doki-theme),
-   tested version **88.1.18**. Install it before running this installer.
-4. At least **3 GB** free space. Internet is needed for artwork missing from the local Doki cache.
+3. At least **3 GB** free space and internet for the first installation.
 
-Extract the release ZIP, open **Install.cmd**, and wait for installation to finish.
+**VS Code and its Doki extension are not required.** The theme catalog is included;
+the installer downloads original artwork automatically and caches it for later installations.
+
+Extract the release ZIP, open **Install.cmd**, and wait for installation to finish. Codex Doki launches automatically.
 Start the app with `%LOCALAPPDATA%\CodexDoki\Start-Doki.cmd`.
 Open your profile menu → Settings → Appearance → Doki Theme.
 
 No third-party Python packages or administrator access are required for the default destination.
-The installer downloads artwork only from Doki's official asset server. Artwork and Codex binaries
+The installer downloads artwork only from Doki's official asset server. Original artwork files and Codex binaries
 are not bundled in this release. Some upstream themes include mature artwork.
 
 The UI profile is named `Codex-Doki`; you may need to sign in once. The backend `.codex` directory,
@@ -61,7 +66,7 @@ including projects and chat history, can be shared with the original app. This i
 py -3 install.py check
 py -3 install.py install
 py -3 install.py install --offline
-py -3 install.py install --codex-path "D:\Apps\Codex\app" --extension-path "D:\Extensions\unthrottled.doki-theme-88.1.18"
+py -3 install.py install --codex-path "D:\Apps\Codex\app"
 py -3 install.py uninstall
 ```
 
@@ -69,6 +74,9 @@ py -3 install.py uninstall
 copying Codex or downloading artwork. Use `--install-dir` for a custom destination; pass the same path
 to uninstall. An existing destination is never overwritten. Close the Doki copy before uninstalling.
 Uninstall retains the UI profile and chats/projects.
+
+The default image cache is `%LOCALAPPDATA%\CodexDokiCache`. `--offline` works after all artwork has been cached.
+`--extension-path` is an optional override for users who want to read a different local Doki extension catalog.
 
 ## Updating and troubleshooting
 

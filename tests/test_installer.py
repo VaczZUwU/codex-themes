@@ -75,6 +75,24 @@ class InstallerTests(unittest.TestCase):
                 installer.obtain_asset('missing.png', self.root, True)
             network.assert_not_called()
 
+    def test_bundled_catalog_needs_no_vscode_extension(self):
+        with patch.object(installer, 'load_themes', side_effect=AssertionError('VS Code must not be required')):
+            themes, version = installer.load_bundled_themes()
+        self.assertEqual(version, '88.1.18')
+        self.assertEqual(len(themes), 88)
+        self.assertEqual(len({image['file'] for theme in themes for image in theme['images']}), 103)
+
+    def test_download_cached_for_future_offline_install(self):
+        data = installer.PNG+b'fixture'
+        from io import BytesIO
+        response = BytesIO(data)
+        response.url = 'https://doki.assets.unthrottled.io/backgrounds/wallpapers/test.png'
+        with patch.object(installer.urllib.request, 'urlopen', return_value=response):
+            self.assertEqual(installer.obtain_asset('test.png', self.root, False), ('test.png', data))
+        with patch.object(installer.urllib.request, 'urlopen') as network:
+            self.assertEqual(installer.obtain_asset('test.png', self.root, True), ('test.png', data))
+            network.assert_not_called()
+
     def test_cached_image_used_offline(self):
         (self.root/'backgrounds').mkdir()
         data = installer.PNG+b'fixture'

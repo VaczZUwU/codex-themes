@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1 — Install without VS Code
+
+- Bundle the 88-theme catalog: VS Code and the Doki extension are no longer required.
+- Download original artwork automatically into a dedicated persistent cache; support offline reuse.
+- Launch Codex Doki automatically after a successful installation with Install.cmd.
+- Show empty new-chat screenshots separately in the English and Russian READMEs.
+
 ## 0.1.0 — Initial experimental release
 
 - Doki theme gallery embedded into Codex Appearance settings.
