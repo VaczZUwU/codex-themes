@@ -1,0 +1,34 @@
+name: Draft release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Match version tag
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python -c "import os,pathlib; assert os.environ['RELEASE_TAG'] == 'v'+pathlib.Path('VERSION').read_text().strip()"
+      - run: python -m unittest discover -s tests -v
+      - run: node --check src/doki.js
+      - run: python scripts/package_release.py
+      - name: Create draft prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Release already exists; preserving its notes and assets."
+          else
+            gh release create "$RELEASE_TAG" dist/*.zip dist/SHA256SUMS.txt --draft --prerelease --title "$RELEASE_TAG — Codex Doki (Windows preview)" --notes-file CHANGELOG.md
+          fi

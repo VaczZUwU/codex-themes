@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+dist/
+.venv/
+runtime/
+assets/
+*.asar
+*.exe
+*.dll
+*.log
+codex-doki-install.json
+.env
