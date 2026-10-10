@@ -7,13 +7,16 @@ Choose a theme from a searchable preview gallery inside **Settings → Appearanc
 
 ## Preview
 
-The interface follows your Codex language. Here are the settings and theme gallery in **English** and **Russian**.
-Click a screenshot to view it at full size.
+The interface follows your Codex language. These screenshots show the **English** interface.
+For Russian screenshots, see the [Russian instructions](README.ru.md#скриншоты).
 
-| English | Русский |
-| --- | --- |
-| ![Doki settings in English](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/settings-en.png) | ![Настройки Doki на русском](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/settings-ru.png) |
-| ![Theme gallery in English](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/gallery-en.png) | ![Галерея тем на русском](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/gallery-ru.png) |
+**Appearance settings**
+
+![Doki settings in English](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/settings-en.png)
+
+**Theme gallery**
+
+![Theme gallery in English](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/gallery-en.png)
 
 ## Features
 

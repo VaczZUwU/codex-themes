@@ -7,13 +7,16 @@
 
 ## Скриншоты
 
-Интерфейс автоматически следует языку Codex. Ниже — настройки и галерея тем **на русском и английском**.
-Нажмите на изображение, чтобы посмотреть его в полном размере.
+Интерфейс автоматически следует языку Codex. Здесь показан интерфейс **на русском**.
+Английские скриншоты находятся в [английской инструкции](README.md#preview).
 
-| Русский | English |
-| --- | --- |
-| ![Настройки Doki на русском](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/settings-ru.png) | ![Doki settings in English](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/settings-en.png) |
-| ![Галерея тем на русском](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/gallery-ru.png) | ![Theme gallery in English](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/gallery-en.png) |
+**Настройки оформления**
+
+![Настройки Doki на русском](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/settings-ru.png)
+
+**Галерея тем**
+
+![Галерея тем на русском](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/gallery-ru.png)
 
 ## Возможности
 
