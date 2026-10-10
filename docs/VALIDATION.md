@@ -28,7 +28,9 @@ The release should remain an experimental prerelease while this final installati
 
 ## Custom-theme development checks
 
-- Browser regression test covers palette creation, WebP image normalization, persistence across reloads, renaming, JSON export/import, rejected remote images/invalid colors/duplicate preset names, English/Russian editor labels, native theme deactivation, gallery reactivation, deletion and preservation through settings reset.
+- Browser regression tests cover palette creation, original image preservation, persistence across reloads, renaming, JSON export/import, rejected remote images/invalid colors/duplicate preset names, English/Russian editor labels, native theme deactivation, gallery reactivation, deletion and preservation through settings reset.
+- A separate test completely closes and launches Chromium with the same on-disk profile: themes, selection and manual/automatic accent preferences restore. It also removes the localStorage selection to verify restoration from the durable database, accepts an image over 8 MB without downscaling and creates a collection exceeding the old 50-theme limit.
 - Uploaded pictures and JSON imports are stored locally in IndexedDB. The existing CSP permits blob/data images; no CSP changes are required.
 - Updated the isolated working desktop copy and visually inspected the Russian editor inside the native Appearance settings at 100% zoom.
+- Selected the existing custom Honkai theme in the real Codex copy, stopped all processes belonging to that isolated runtime and launched it again: its purple custom palette restored on the new-chat screen.
 - Browser editor snapshots use a controlled test fixture and are kept as local QA artifacts; they are not presented as native-app screenshots in the README.

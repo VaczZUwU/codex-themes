@@ -38,28 +38,37 @@
     if(language==='en')return `${number} ${count===1?'variant':'variants'}`;
     return `${tr('variant')} × ${number}`;
   }
-  Object.assign(messages.en,{customThemes:'Custom themes',createTheme:'Create theme',editTheme:'Edit theme',importTheme:'Import JSON',exportTheme:'Export JSON',deleteTheme:'Delete theme',themeName:'Name',backgroundColor:'Background',textColor:'Text',accentColor:'Accent',uploadWallpaper:'Choose wallpaper',removeWallpaper:'Remove wallpaper',saveTheme:'Save and apply',cancel:'Cancel',customHint:'PNG, JPEG or WebP. Images are resized to 1600 px and stored in this Codex Doki profile.',customError:'Could not save or load the theme. Use a unique name, valid colors and an image under 8 MB.',deleteConfirm:'Delete this custom theme?',customSaved:'Theme saved.',imported:'Theme imported.',noWallpaper:'No wallpaper',customLoading:'Loading custom themes…'});
-  Object.assign(messages.ru,{customThemes:'Свои темы',createTheme:'Создать тему',editTheme:'Изменить тему',importTheme:'Импорт JSON',exportTheme:'Экспорт JSON',deleteTheme:'Удалить тему',themeName:'Название',backgroundColor:'Фон',textColor:'Текст',accentColor:'Акцент',uploadWallpaper:'Выбрать фон',removeWallpaper:'Убрать фон',saveTheme:'Сохранить и применить',cancel:'Отмена',customHint:'PNG, JPEG или WebP. Изображения уменьшаются до 1600 пикселей и сохраняются в этом профиле Codex Doki.',customError:'Не удалось сохранить или загрузить тему. Нужны уникальное название, корректные цвета и картинка до 8 МБ.',deleteConfirm:'Удалить эту свою тему?',customSaved:'Тема сохранена.',imported:'Тема импортирована.',noWallpaper:'Без картинки',customLoading:'Загрузка своих тем…'});
+  Object.assign(messages.en,{customThemes:'Custom themes',createTheme:'Create theme',editTheme:'Edit theme',importTheme:'Import JSON',exportTheme:'Export JSON',deleteTheme:'Delete theme',themeName:'Name',backgroundColor:'Background',textColor:'Text',accentColor:'Accent',uploadWallpaper:'Choose wallpaper',removeWallpaper:'Remove wallpaper',saveTheme:'Save and apply',cancel:'Cancel',customHint:'PNG, JPEG or WebP. Original quality and resolution are preserved in this Codex Doki profile.',customError:'Could not save or load the theme.',deleteConfirm:'Delete this custom theme?',customSaved:'Theme saved.',imported:'Theme imported.',noWallpaper:'No wallpaper',customLoading:'Loading custom themes…'});
+  Object.assign(messages.ru,{customThemes:'Свои темы',createTheme:'Создать тему',editTheme:'Изменить тему',importTheme:'Импорт JSON',exportTheme:'Экспорт JSON',deleteTheme:'Удалить тему',themeName:'Название',backgroundColor:'Фон',textColor:'Текст',accentColor:'Акцент',uploadWallpaper:'Выбрать фон',removeWallpaper:'Убрать фон',saveTheme:'Сохранить и применить',cancel:'Отмена',customHint:'PNG, JPEG или WebP. Исходные качество и разрешение сохраняются в этом профиле Codex Doki.',customError:'Не удалось сохранить или загрузить тему.',deleteConfirm:'Удалить эту свою тему?',customSaved:'Тема сохранена.',imported:'Тема импортирована.',noWallpaper:'Без картинки',customLoading:'Загрузка своих тем…'});
+  Object.assign(messages['ru-RU'],messages.ru);
+  Object.assign(messages.en,{autoAccent:'Automatic accent from wallpaper',nameError:'Enter a theme name.',duplicateError:'A theme with this name already exists. Choose a different name.',colorError:'Use a valid color in #RRGGBB format.',imageError:'Could not read the image. Choose a valid PNG, JPEG or WebP.',formatError:'Choose a valid Codex Doki theme JSON file.',storageError:'Could not save the theme in this profile. Check available disk space.'});
+  Object.assign(messages.ru,{autoAccent:'Акцент автоматически из фона',nameError:'Введите название темы.',duplicateError:'Тема с таким названием уже существует. Выберите другое название.',colorError:'Нужен корректный цвет в формате #RRGGBB.',imageError:'Не удалось прочитать картинку. Выберите корректный PNG, JPEG или WebP.',formatError:'Выберите корректный JSON-файл темы Codex Doki.',storageError:'Не удалось сохранить тему в этом профиле. Проверьте свободное место на диске.'});
   Object.assign(messages['ru-RU'],messages.ru);
   const blankImage='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGBgAAAABQABpfZFQAAAAABJRU5ErkJggg==';
   const imageURL=image=>image.data||new URL(`./doki/${image.file}`,document.baseURI).href;
-  let customDB, customBusy=false, editing=null, draftImage='';
+  let customDB, customBusy=false, editing=null, draftImage='', draftAccent=null, initialized=false, lastPersisted='', selectionWrite=Promise.resolve();
   function database(){return new Promise((resolve,reject)=>{const request=indexedDB.open('codex-doki-custom-v1',1);request.onupgradeneeded=()=>request.result.createObjectStore('themes');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});}
   async function storeCustom(next){
-    if(!customDB)throw new Error('Storage unavailable');
-    await new Promise((resolve,reject)=>{const tx=customDB.transaction('themes','readwrite');tx.objectStore('themes').put(next,'all');tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);});
+    if(!customDB)throw new Error('storageError');
+    await new Promise((resolve,reject)=>{const tx=customDB.transaction('themes','readwrite',{durability:'strict'});tx.objectStore('themes').put(next,'all');tx.oncomplete=resolve;tx.onerror=()=>reject(new Error('storageError'));tx.onabort=()=>reject(new Error('storageError'));});
     themes.splice(DOKI_THEMES.length,themes.length-DOKI_THEMES.length,...next);
   }
-  function validateCustom(value){
-    if(!value||typeof value.name!=='string'||!value.name.trim()||value.name.trim().length>80)throw new Error('Name');
-    const colors={};for(const field of ['background','foreground','accent']){if(!/^#[0-9a-f]{6}$/i.test(value.colors?.[field]||''))throw new Error('Color');colors[field]=value.colors[field];}
-    const data=value.wallpaper??'';
-    if(typeof data!=='string'||data.length>3000000||(data&&!/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+=*$/.test(data)))throw new Error('Image');
-    return {name:value.name.trim(),custom:true,group:'Custom',dark:luminance(rgb(colors.background))<.5,colors,images:[{variant:'default',data:data||blankImage,readingOpacity:.1,anchor:'right'}]};
+  function persistSettings(){
+    if(!initialized)return;
+    const snapshot=JSON.stringify(settings);if(snapshot===lastPersisted)return;lastPersisted=snapshot;
+    try{localStorage.setItem(key,snapshot);}catch{}
+    if(customDB){selectionWrite=selectionWrite.catch(()=>{}).then(()=>new Promise((resolve,reject)=>{const tx=customDB.transaction('themes','readwrite',{durability:'strict'});tx.objectStore('themes').put(JSON.parse(snapshot),'settings');tx.oncomplete=resolve;tx.onerror=()=>reject(new Error('storageError'));tx.onabort=()=>reject(new Error('storageError'));}));selectionWrite.catch(()=>{$('status').textContent=tr('storageError');lastPersisted='';});}
   }
-  const portable=t=>({name:t.name,colors:{...t.colors},wallpaper:t.images[0].data===blankImage?'':t.images[0].data});
-  function uniqueName(name,except){if(themes.some(t=>t!==except&&t.name.toLowerCase()===name.toLowerCase()))throw new Error('Duplicate');}
-  async function decodeImage(data){const img=new Image();img.src=data;await img.decode();if(!img.naturalWidth||!img.naturalHeight||img.naturalWidth*img.naturalHeight>50000000)throw new Error('Image dimensions');return img;}
+  function validateCustom(value){
+    if(!value||typeof value.name!=='string'||!value.name.trim())throw new Error('nameError');
+    const colors={};for(const field of ['background','foreground','accent']){if(!/^#[0-9a-f]{6}$/i.test(value.colors?.[field]||''))throw new Error('colorError');colors[field]=value.colors[field];}
+    const data=value.wallpaper??'';
+    if(typeof data!=='string'||(data&&!/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+=*$/.test(data)))throw new Error('imageError');
+    return {name:value.name.trim(),custom:true,autoAccent:value.autoAccent===true,group:'Custom',dark:luminance(rgb(colors.background))<.5,colors,images:[{variant:'default',data:data||blankImage,readingOpacity:.1,anchor:'right'}]};
+  }
+  const portable=t=>({name:t.name,colors:{...t.colors},autoAccent:t.autoAccent===true,wallpaper:t.images[0].data===blankImage?'':t.images[0].data});
+  function uniqueName(name,except){if(themes.some(t=>t!==except&&t.name.toLowerCase()===name.toLowerCase()))throw new Error('duplicateError');}
+  async function decodeImage(data){const img=new Image();img.src=data;try{await img.decode();}catch{throw new Error('imageError');}if(!img.naturalWidth||!img.naturalHeight)throw new Error('imageError');return img;}
   const style = document.createElement('style');
   style.id = 'doki-theme-style';
   document.head.append(style);
@@ -113,7 +122,7 @@
   </section><button id="toggle">Doki</button>
   <dialog id="theme-dialog" aria-labelledby="gallery-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="gallery-title" data-i18n="chooseTheme"></h3><button id="close-gallery" type="button" aria-label="Close">×</button></div><input id="search" type="search" placeholder="Senko, Rem, Fate…"></div><div id="gallery"></div></dialog>
   <dialog id="artwork-dialog" aria-labelledby="artwork-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="artwork-title" data-i18n="variant"></h3><button id="close-artwork" type="button" aria-label="Close">×</button></div></div><div id="artwork-gallery"></div></dialog>
-  <dialog id="custom-dialog" aria-labelledby="custom-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="custom-title"></h3><button type="button" id="custom-close" class="chip">×</button></div></div><form id="custom-form"><div class="row"><label for="custom-name" data-i18n="themeName"></label><input id="custom-name" maxlength="80" required></div><div class="row"><label for="custom-background" data-i18n="backgroundColor"></label><input id="custom-background" type="color"></div><div class="row"><label for="custom-foreground" data-i18n="textColor"></label><input id="custom-foreground" type="color"></div><div class="row"><label for="custom-accent" data-i18n="accentColor"></label><input id="custom-accent" type="color"></div><div id="custom-preview"></div><div class="custom-actions"><button type="button" class="chip" id="custom-upload" data-i18n="uploadWallpaper"></button><button type="button" class="chip" id="custom-remove" data-i18n="removeWallpaper"></button><input hidden id="custom-image" type="file" accept="image/png,image/jpeg,image/webp"></div><p id="custom-hint" data-i18n="customHint"></p><p id="custom-error" role="alert"></p><div class="custom-actions"><button type="submit" class="chip" id="custom-save" data-i18n="saveTheme"></button><button type="button" class="chip" id="custom-cancel" data-i18n="cancel"></button></div></form></dialog>`;
+  <dialog id="custom-dialog" aria-labelledby="custom-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="custom-title"></h3><button type="button" id="custom-close" class="chip">×</button></div></div><form id="custom-form"><div class="row"><label for="custom-name" data-i18n="themeName"></label><input id="custom-name" required></div><div class="row"><label for="custom-background" data-i18n="backgroundColor"></label><input id="custom-background" type="color"></div><div class="row"><label for="custom-foreground" data-i18n="textColor"></label><input id="custom-foreground" type="color"></div><div class="row"><label for="custom-accent" data-i18n="accentColor"></label><input id="custom-accent" type="color"></div><div class="row"><label for="custom-auto-accent" data-i18n="autoAccent"></label><input id="custom-auto-accent" type="checkbox" role="switch"></div><div id="custom-preview"></div><div class="custom-actions"><button type="button" class="chip" id="custom-upload" data-i18n="uploadWallpaper"></button><button type="button" class="chip" id="custom-remove" data-i18n="removeWallpaper"></button><input hidden id="custom-image" type="file" accept="image/png,image/jpeg,image/webp"></div><p id="custom-hint" data-i18n="customHint"></p><p id="custom-error" role="alert"></p><div class="custom-actions"><button type="submit" class="chip" id="custom-save" data-i18n="saveTheme"></button><button type="button" class="chip" id="custom-cancel" data-i18n="cancel"></button></div></form></dialog>`;
   const $ = id => shadow.getElementById(id);
   function current() { return themes.find(t => t.name === settings.theme) || themes.find(t => t.name === 'Senko') || themes[0]; }
   function translate() {
@@ -257,7 +266,7 @@
     for(const [id,alpha] of [['home-art',settings.opacity],['reading-art',readingOpacity]]){$(id).style.backgroundImage=settings.enabled?`url(${JSON.stringify(url)})`:'none';$(id).style.opacity=String(alpha);$(id).style.backgroundPosition=`${image.anchor==='left'?'left':'right'} center`;}
     $('status').textContent='';
     const probe=new Image();probe.onerror=()=>{$('status').textContent=tr('failed');};probe.src=url;
-    try { localStorage.setItem(key, JSON.stringify(settings)); } catch {}
+    persistSettings();
     window.__dokiThemeStatus={name:t.name,themes:themes.length,image:url,enabled:settings.enabled,active:settings.active,language:settings.language,readingOpacity,palette:{background:bg,foreground:fg,secondary,tertiary,accent,buttonBg,buttonFg,bubbleBg}};
     host.style.setProperty('--doki-accent',accent);host.style.setProperty('--doki-switch-thumb',thumb);
     syncSelectionDisplay();
@@ -283,7 +292,7 @@
     settings.active=false;style.textContent='';
     delete root.dataset.doki;delete root.dataset.dokiReading;
     Array.from(root.style).filter(property=>property.startsWith('--doki-')).forEach(property=>root.style.removeProperty(property));
-    try{localStorage.setItem(key,JSON.stringify(settings));}catch{}
+    persistSettings();
     if(window.__dokiThemeStatus)window.__dokiThemeStatus.active=false;
     syncSelectionDisplay();
     syncCodeContrast();
@@ -322,42 +331,52 @@
   $('enabled').onchange=()=>{settings.enabled=$('enabled').checked;apply();};
   $('reset').onclick=()=>{const language=settings.language;settings={...defaults,language};$('search').value='';translate();populate();apply();};
   shadow.addEventListener('keydown',e=>{if(e.key==='Escape'&&!host.hasAttribute('data-embedded')){$('panel').classList.remove('open');$('toggle').setAttribute('aria-expanded','false');$('toggle').focus();}});
+  function wallpaperAccent(img){
+    const canvas=document.createElement('canvas');canvas.width=canvas.height=64;
+    const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,64,64);
+    const pixels=ctx.getImageData(0,0,64,64).data,buckets=new Map();
+    for(let i=0;i<pixels.length;i+=4){if(pixels[i+3]<128)continue;const color=[pixels[i],pixels[i+1],pixels[i+2]],max=Math.max(...color),min=Math.min(...color),sat=(max-min)/255,light=luminance(color);if(light<.025||light>.9)continue;
+      const key=color.map(v=>v>>4).join(',');const bucket=buckets.get(key)||{weight:0,total:0,sum:[0,0,0]};const weight=.1+sat*sat*3;bucket.weight+=weight;bucket.total++;color.forEach((v,k)=>bucket.sum[k]+=v);buckets.set(key,bucket);
+    }
+    const best=[...buckets.values()].sort((a,b)=>b.weight-a.weight)[0];return best?hex(best.sum.map(v=>v/best.total)):null;
+  }
+  function pickAccent(){if(!$('custom-auto-accent').checked)return;const bg=rgb($('custom-background').value);$('custom-accent').value=hex(readable(rgb(draftAccent||current().colors.accent),[bg,mix(bg,readable(rgb($('custom-foreground').value),[bg],7),.09)],3.1));}
   function previewCustom(){
     const p=$('custom-preview'),bg=$('custom-background').value,base=rgb(bg),fg=hex(readable(rgb($('custom-foreground').value),[base,mix(base,[255,255,255],.1),mix(base,[0,0,0],.1)]));p.style.backgroundColor=bg;p.style.color=fg;p.style.backgroundImage=draftImage?`linear-gradient(${bg}e6,${bg}e6),url(${JSON.stringify(draftImage)})`:'none';p.textContent=$('custom-name').value||tr('themeName');p.style.borderColor=$('custom-accent').value;
   }
   function editCustom(theme){
-    editing=theme;draftImage=theme?.images[0].data||'';if(draftImage===blankImage)draftImage='';
+    editing=theme;draftAccent=null;$('custom-auto-accent').checked=theme?theme.autoAccent===true:true;draftImage=theme?.images[0].data||'';if(draftImage===blankImage)draftImage='';
     $('custom-title').textContent=tr(theme?'editTheme':'createTheme');$('custom-name').value=theme?.name||'';
     for(const field of ['background','foreground','accent'])$('custom-'+field).value=(theme||current()).colors[field];
-    $('custom-error').textContent='';$('custom-image').value='';previewCustom();$('custom-dialog').showModal();$('custom-name').focus();
+    $('custom-error').textContent='';$('custom-image').value='';previewCustom();$('custom-dialog').showModal();$('custom-name').focus();if(draftImage)customOperation(async()=>{draftAccent=wallpaperAccent(await decodeImage(draftImage));pickAccent();previewCustom();},$('custom-error'));else{pickAccent();previewCustom();}
   }
   async function customOperation(action,errorElement=$('status')){
     if(customBusy)return;customBusy=true;syncSelectionDisplay();$('custom-save').disabled=true;errorElement.textContent='';
-    try{await action();}catch{errorElement.textContent=tr('customError');}
+    try{await action();}catch(error){const reason=error instanceof SyntaxError?'formatError':error.message;errorElement.textContent=tr(messages.en[reason]?reason:'customError');}
     finally{customBusy=false;syncSelectionDisplay();$('custom-save').disabled=false;}
   }
   $('custom-create').onclick=()=>editCustom(null);$('custom-edit').onclick=()=>{if(current().custom)editCustom(current());};
   for(const id of ['custom-close','custom-cancel'])$(id).onclick=()=>{if(!customBusy){$('custom-dialog').close();$('theme-picker').focus();}};
   $('custom-close').setAttribute('aria-label',tr('close'));
   $('custom-dialog').addEventListener('cancel',e=>{if(customBusy)e.preventDefault();});
-  for(const id of ['custom-name','custom-background','custom-foreground','custom-accent'])$(id).oninput=previewCustom;
+  for(const id of ['custom-name','custom-background','custom-foreground'])$(id).oninput=()=>{pickAccent();previewCustom();};$('custom-accent').oninput=()=>{$('custom-auto-accent').checked=false;previewCustom();};$('custom-auto-accent').onchange=()=>{pickAccent();previewCustom();};
   $('custom-upload').onclick=()=>$('custom-image').click();
-  $('custom-remove').onclick=()=>{if(!customBusy){draftImage='';previewCustom();}};
+  $('custom-remove').onclick=()=>{if(!customBusy){draftImage='';draftAccent=null;pickAccent();previewCustom();}};
   $('custom-image').onchange=()=>customOperation(async()=>{
     const file=$('custom-image').files[0];if(!file)return;
-    if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>8*1024*1024)throw new Error('Image size/type');
+    if(!['image/png','image/jpeg','image/webp'].includes(file.type))throw new Error('imageError');
     const object=URL.createObjectURL(file);
-    try{const img=await decodeImage(object),scale=Math.min(1,1600/img.naturalWidth,1600/img.naturalHeight),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);const data=canvas.toDataURL('image/webp',.9);if(data.length>3000000)throw new Error('Image too large');draftImage=data;previewCustom();}finally{URL.revokeObjectURL(object);}
+    try{const img=await decodeImage(object);const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('imageError'));reader.readAsDataURL(file);});draftImage=data;draftAccent=wallpaperAccent(img);pickAccent();previewCustom();}finally{URL.revokeObjectURL(object);}
   },$('custom-error'));
   $('custom-form').onsubmit=event=>{event.preventDefault();customOperation(async()=>{
-    const t=validateCustom({name:$('custom-name').value,colors:Object.fromEntries(['background','foreground','accent'].map(f=>[f,$('custom-'+f).value])),wallpaper:draftImage});uniqueName(t.name,editing);
-    const next=themes.filter(t=>t.custom&&t!==editing);if(next.length>=50)throw new Error('Limit');next.push(t);await storeCustom(next);
-    settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();$('custom-dialog').close();$('theme-picker').focus();$('status').textContent=tr('customSaved');
+    const t=validateCustom({name:$('custom-name').value,colors:Object.fromEntries(['background','foreground','accent'].map(f=>[f,$('custom-'+f).value])),wallpaper:draftImage,autoAccent:$('custom-auto-accent').checked});uniqueName(t.name,editing);
+    const next=themes.filter(t=>t.custom&&t!==editing);next.push(t);await storeCustom(next);
+    settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();await selectionWrite;$('custom-dialog').close();$('theme-picker').focus();$('status').textContent=tr('customSaved');
   },$('custom-error'));};
-  $('custom-delete').onclick=()=>{const t=current();if(!t.custom||!confirm(tr('deleteConfirm')))return;customOperation(async()=>{await storeCustom(themes.filter(x=>x.custom&&x!==t));deactivateDoki();populate();apply();renderGallery();});};
+  $('custom-delete').onclick=()=>{const t=current();if(!t.custom||!confirm(tr('deleteConfirm')))return;customOperation(async()=>{await storeCustom(themes.filter(x=>x.custom&&x!==t));deactivateDoki();populate();apply();await selectionWrite;renderGallery();});};
   $('custom-export').onclick=()=>{if(!current().custom)return;const t=current(),blob=new Blob([JSON.stringify({format:'codex-doki-theme',version:1,theme:portable(t)},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=t.name.replace(/[^a-z0-9_-]/gi,'_')+'.json';shadow.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);};
   $('custom-import').onclick=()=>{$('custom-import-file').value='';$('custom-import-file').click();};
-  $('custom-import-file').onchange=()=>customOperation(async()=>{const file=$('custom-import-file').files[0];if(!file)return;if(file.size>4*1024*1024)throw new Error('File size');const payload=JSON.parse(await file.text());if(payload.format!=='codex-doki-theme'||payload.version!==1)throw new Error('Format');const t=validateCustom(payload.theme);uniqueName(t.name);if(t.images[0].data!==blankImage)await decodeImage(t.images[0].data);const next=themes.filter(t=>t.custom);if(next.length>=50)throw new Error('Limit');await storeCustom([...next,t]);settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();$('status').textContent=tr('imported');});
+  $('custom-import-file').onchange=()=>customOperation(async()=>{const file=$('custom-import-file').files[0];if(!file)return;const payload=JSON.parse(await file.text());if(payload.format!=='codex-doki-theme'||payload.version!==1)throw new Error('formatError');const t=validateCustom(payload.theme);uniqueName(t.name);if(t.images[0].data!==blankImage)await decodeImage(t.images[0].data);const next=themes.filter(t=>t.custom);await storeCustom([...next,t]);settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();await selectionWrite;$('status').textContent=tr('imported');});
 
   const integrationStyle=document.createElement('style');
   integrationStyle.id='doki-settings-integration-style';
@@ -449,12 +468,14 @@
     syncCodeContrast();
   }).observe(root,{attributes:true,attributeFilter:['lang','data-theme']});
   async function initialize(){
-    try{customDB=await database();const saved=await new Promise((resolve,reject)=>{const tx=customDB.transaction('themes');const r=tx.objectStore('themes').get('all');r.onsuccess=()=>resolve(r.result||[]);r.onerror=()=>reject(r.error);});
-      if(!Array.isArray(saved)||saved.length>50)throw new Error('Stored themes');
+    try{customDB=await database();const stored=await new Promise((resolve,reject)=>{const tx=customDB.transaction('themes');const all=tx.objectStore('themes').get('all'),selected=tx.objectStore('themes').get('settings');tx.oncomplete=()=>resolve({themes:all.result||[],settings:selected.result});tx.onerror=()=>reject(tx.error);});const saved=stored.themes;
+      if(!Array.isArray(saved))throw new Error('Stored themes');
       for(const entry of saved){const t=validateCustom(portable(entry));uniqueName(t.name);themes.push(t);}
+      if(stored.settings&&typeof stored.settings.theme==='string')settings={...defaults,...stored.settings,language:codexLanguage()};
     }catch{customDB?.close();customDB=null;}
+    initialized=true;settings.language=codexLanguage();
     document.body.append(host);translate();populate();apply();syncAppearanceIntegration();
-    if(!customDB)$('status').textContent=tr('customError');
+    if(!customDB)$('status').textContent=tr('storageError');
   }
   initialize();
 })();

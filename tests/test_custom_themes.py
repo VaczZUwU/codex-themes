@@ -3,6 +3,9 @@ import base64
 import json
 from pathlib import Path
 import threading
+import tempfile
+import struct
+import zlib
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 try:
@@ -27,6 +30,53 @@ class Handler(BaseHTTPRequestHandler):
 
 @unittest.skipIf(sync_playwright is None, 'Install playwright and Chromium for browser checks')
 class CustomThemes(unittest.TestCase):
+    def test_original_large_image_auto_accent_and_full_process_restart(self):
+        def chunk(kind,data): return struct.pack('>I',len(data))+kind+data+struct.pack('>I',zlib.crc32(kind+data)&0xffffffff)
+        # A wide red image with harmless trailing bytes exceeds the old 8 MB input limit.
+        width=4097
+        image=b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('>IIBBBBB',width,1,8,2,0,0,0))+chunk(b'IDAT',zlib.compress(b'\0'+bytes([215,75,105])*width))+chunk(b'IEND',b'')+b'\0'*(9*1024*1024)
+        server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
+        threading.Thread(target=server.serve_forever,daemon=True).start()
+        try:
+            with tempfile.TemporaryDirectory() as profile,sync_playwright() as p:
+                def launch():
+                    context=p.chromium.launch_persistent_context(profile,viewport={'width':1000,'height':1050},accept_downloads=True)
+                    page=context.pages[0];page.goto(f'http://127.0.0.1:{server.server_port}/');page.locator('#doki-settings-tab').click()
+                    return context,page,page.locator('#doki-controls')
+                context,page,h=launch()
+                h.locator('#custom-create').click();h.locator('#custom-name').fill('Automatic red')
+                expect(h.locator('#custom-auto-accent')).to_be_checked()
+                h.locator('#custom-background').fill('#101820')
+                h.locator('#custom-image').set_input_files({'name':'large.png','mimeType':'image/png','buffer':image})
+                expect(h.locator('#custom-save')).to_be_enabled()
+                self.assertEqual(h.locator('#custom-accent').input_value(),'#d74b69')
+                h.locator('#custom-save').click();expect(h.locator('#custom-dialog')).not_to_be_visible(timeout=20000)
+                with page.expect_download() as dl:h.locator('#custom-export').click()
+                exported=json.loads(Path(dl.value.path()).read_text());self.assertTrue(exported['theme']['autoAccent'])
+                self.assertEqual(base64.b64decode(exported['theme']['wallpaper'].split(',')[1]),image)
+                self.assertEqual(page.evaluate('''async()=>{const i=new Image();i.src=window.__dokiThemeStatus.image;await i.decode();return i.naturalWidth;}'''),width)
+                # Remove localStorage to exercise the durable selection backup, then terminate the complete Chromium process.
+                page.evaluate("localStorage.removeItem('codex-doki-settings-v1')")
+                context.close()
+                context,page,h=launch();expect(h.locator('#theme-name')).to_have_text('Automatic red')
+                self.assertTrue(page.evaluate('window.__dokiThemeStatus.active'))
+                h.locator('#custom-edit').click();expect(h.locator('#custom-save')).to_be_enabled()
+                h.locator('#custom-accent').fill('#35b18d');expect(h.locator('#custom-auto-accent')).not_to_be_checked()
+                h.locator('#custom-save').click();expect(h.locator('#custom-dialog')).not_to_be_visible(timeout=20000)
+                context.close();context,page,h=launch()
+                h.locator('#custom-edit').click();expect(h.locator('#custom-save')).to_be_enabled()
+                expect(h.locator('#custom-auto-accent')).not_to_be_checked();self.assertEqual(h.locator('#custom-accent').input_value(),'#35b18d')
+                h.locator('#custom-cancel').click()
+                # Existing collections over the former 50-theme limit must restore and accept another theme.
+                page.evaluate('''async()=>{const db=await new Promise((resolve,reject)=>{const r=indexedDB.open('codex-doki-custom-v1');r.onsuccess=()=>resolve(r.result);r.onerror=reject;});await new Promise((resolve,reject)=>{const tx=db.transaction('themes','readwrite',{durability:'strict'}),store=tx.objectStore('themes'),r=store.get('all');r.onsuccess=()=>{const original=r.result[0];store.put(Array.from({length:52},(_,i)=>({...original,name:i===0?'Automatic red':'Saved '+i,images:[{variant:'default',readingOpacity:.1,anchor:'right',data:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a0ioAAAAASUVORK5CYII='}]})),'all');};tx.oncomplete=resolve;tx.onerror=reject;});db.close();}''')
+                context.close();context,page,h=launch();self.assertEqual(page.evaluate('window.__dokiThemeStatus.themes'),140)
+                h.locator('#custom-create').click();h.locator('#custom-name').fill('Theme 53');h.locator('#custom-save').click()
+                expect(h.locator('#custom-dialog')).not_to_be_visible();self.assertEqual(page.evaluate('window.__dokiThemeStatus.themes'),141)
+                h.locator('#custom-import-file').set_input_files({'name':'malformed.json','mimeType':'application/json','buffer':b'{broken'})
+                expect(h.locator('#status')).to_have_text('Choose a valid Codex Doki theme JSON file.')
+                context.close()
+        finally:server.shutdown();server.server_close()
+
     def test_editor_storage_import_export_and_native_reset(self):
         server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
         thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
@@ -50,7 +100,7 @@ class CustomThemes(unittest.TestCase):
                 status=page.evaluate('window.__dokiThemeStatus')
                 self.assertEqual(status['palette']['background'], '#fafafa')
                 self.assertNotEqual(status['palette']['foreground'], '#eeeeee')
-                self.assertTrue(status['image'].startswith('data:image/webp;'))
+                self.assertTrue(status['image'].startswith('data:image/png;'))
                 self.assertEqual(status['themes'],89)
                 page.reload();page.locator('#doki-settings-tab').click()
                 expect(h.locator('#theme-name')).to_have_text('My Aurora')
@@ -64,10 +114,10 @@ class CustomThemes(unittest.TestCase):
                 h.locator('#custom-import-file').set_input_files({'name':'theme.json','mimeType':'application/json','buffer':json.dumps(payload).encode()})
                 expect(h.locator('#theme-name')).to_have_text('Imported Aurora')
                 # Reject remote resources, malformed colors, and duplicate built-in names without mutating the selected theme.
-                for change in [{'wallpaper':'https://example.com/x.png'}, {'colors':{'background':'red'}}, {'name':'Senko'}]:
+                for change,message in [({'wallpaper':'https://example.com/x.png'},'Could not read the image. Choose a valid PNG, JPEG or WebP.'), ({'colors':{'background':'red'}},'Use a valid color in #RRGGBB format.'), ({'name':'Senko'},'A theme with this name already exists. Choose a different name.')]:
                     bad={**payload,'theme':{**payload['theme'],**change}}
                     h.locator('#custom-import-file').set_input_files({'name':'invalid.json','mimeType':'application/json','buffer':json.dumps(bad).encode()})
-                    expect(h.locator('#status')).to_have_text('Could not save or load the theme. Use a unique name, valid colors and an image under 8 MB.')
+                    expect(h.locator('#status')).to_have_text(message)
                     expect(h.locator('#theme-name')).to_have_text('Imported Aurora')
                 page.evaluate("document.documentElement.lang='ru-RU'")
                 expect(h.locator('#custom-create')).to_have_text('Создать тему')
