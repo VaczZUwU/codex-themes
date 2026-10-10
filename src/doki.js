@@ -46,7 +46,10 @@
   Object.assign(messages['ru-RU'],messages.ru);
   const blankImage='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGBgAAAABQABpfZFQAAAAABJRU5ErkJggg==';
   const imageURL=image=>image.data||new URL(`./doki/${image.file}`,document.baseURI).href;
-  let customDB, customBusy=false, editing=null, draftImage='', draftAccent=null, initialized=false, lastPersisted='', selectionWrite=Promise.resolve();
+  Object.assign(messages.en,{optimizeWallpaper:'Optimize large wallpapers',optimizedHint:'PNG, JPEG or WebP. Large images are optimized for a 4K background; disable optimization to keep the original.',imageSize:'Wallpaper size'});
+  Object.assign(messages.ru,{optimizeWallpaper:'Оптимизировать тяжёлые фоны',optimizedHint:'PNG, JPEG или WebP. Тяжёлые картинки оптимизируются под фон до 4K; отключите оптимизацию, чтобы сохранить оригинал.',imageSize:'Размер фона'});
+  Object.assign(messages['ru-RU'],messages.ru);messages.en.customHint=messages.en.optimizedHint;messages.ru.customHint=messages.ru.optimizedHint;messages['ru-RU'].customHint=messages.ru.customHint;
+  let customDB, customBusy=false, editing=null, draftImage='', draftOriginal='', draftAccent=null, initialized=false, lastPersisted='', selectionWrite=Promise.resolve();
   function database(){return new Promise((resolve,reject)=>{const request=indexedDB.open('codex-doki-custom-v1',1);request.onupgradeneeded=()=>request.result.createObjectStore('themes');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});}
   async function storeCustom(next){
     if(!customDB)throw new Error('storageError');
@@ -64,11 +67,21 @@
     const colors={};for(const field of ['background','foreground','accent']){if(!/^#[0-9a-f]{6}$/i.test(value.colors?.[field]||''))throw new Error('colorError');colors[field]=value.colors[field];}
     const data=value.wallpaper??'';
     if(typeof data!=='string'||(data&&!/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+=*$/.test(data)))throw new Error('imageError');
-    return {name:value.name.trim(),custom:true,autoAccent:value.autoAccent===true,group:'Custom',dark:luminance(rgb(colors.background))<.5,colors,images:[{variant:'default',data:data||blankImage,readingOpacity:.1,anchor:'right'}]};
+    return {name:value.name.trim(),custom:true,autoAccent:value.autoAccent===true,optimizeWallpaper:value.optimizeWallpaper!==false,group:'Custom',dark:luminance(rgb(colors.background))<.5,colors,images:[{variant:'default',data:data||blankImage,readingOpacity:.1,anchor:'right'}]};
   }
-  const portable=t=>({name:t.name,colors:{...t.colors},autoAccent:t.autoAccent===true,wallpaper:t.images[0].data===blankImage?'':t.images[0].data});
+  const portable=t=>({name:t.name,colors:{...t.colors},autoAccent:t.autoAccent===true,optimizeWallpaper:t.optimizeWallpaper!==false,wallpaper:t.images[0].data===blankImage?'':t.images[0].data});
   function uniqueName(name,except){if(themes.some(t=>t!==except&&t.name.toLowerCase()===name.toLowerCase()))throw new Error('duplicateError');}
   async function decodeImage(data){const img=new Image();img.src=data;try{await img.decode();}catch{throw new Error('imageError');}if(!img.naturalWidth||!img.naturalHeight)throw new Error('imageError');return img;}
+  const imageBytes=data=>data?Math.floor((data.length-data.indexOf(',')-1)*3/4)-(data.endsWith('==')?2:data.endsWith('=')?1:0):0;
+  async function optimizedWallpaper(img,data,enabled=true){
+    if(!enabled||(imageBytes(data)<=2*1024*1024&&Math.max(img.naturalWidth,img.naturalHeight)<=3840))return data;
+    const scale=Math.min(1,3840/img.naturalWidth,3840/img.naturalHeight),canvas=document.createElement('canvas');
+    canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
+    try{const context=canvas.getContext('2d');context.imageSmoothingEnabled=true;context.imageSmoothingQuality='high';context.drawImage(img,0,0,canvas.width,canvas.height);
+      const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.9));if(!blob||blob.type!=='image/webp'||blob.size>=imageBytes(data))return data;
+      return await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('imageError'));reader.readAsDataURL(blob);});
+    }catch{return data;}finally{canvas.width=canvas.height=0;}
+  }
   const style = document.createElement('style');
   style.id = 'doki-theme-style';
   document.head.append(style);
@@ -122,7 +135,7 @@
   </section><button id="toggle">Doki</button>
   <dialog id="theme-dialog" aria-labelledby="gallery-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="gallery-title" data-i18n="chooseTheme"></h3><button id="close-gallery" type="button" aria-label="Close">×</button></div><input id="search" type="search" placeholder="Senko, Rem, Fate…"></div><div id="gallery"></div></dialog>
   <dialog id="artwork-dialog" aria-labelledby="artwork-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="artwork-title" data-i18n="variant"></h3><button id="close-artwork" type="button" aria-label="Close">×</button></div></div><div id="artwork-gallery"></div></dialog>
-  <dialog id="custom-dialog" aria-labelledby="custom-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="custom-title"></h3><button type="button" id="custom-close" class="chip">×</button></div></div><form id="custom-form"><div class="row"><label for="custom-name" data-i18n="themeName"></label><input id="custom-name" required></div><div class="row"><label for="custom-background" data-i18n="backgroundColor"></label><input id="custom-background" type="color"></div><div class="row"><label for="custom-foreground" data-i18n="textColor"></label><input id="custom-foreground" type="color"></div><div class="row"><label for="custom-accent" data-i18n="accentColor"></label><input id="custom-accent" type="color"></div><div class="row"><label for="custom-auto-accent" data-i18n="autoAccent"></label><input id="custom-auto-accent" type="checkbox" role="switch"></div><div id="custom-preview"></div><div class="custom-actions"><button type="button" class="chip" id="custom-upload" data-i18n="uploadWallpaper"></button><button type="button" class="chip" id="custom-remove" data-i18n="removeWallpaper"></button><input hidden id="custom-image" type="file" accept="image/png,image/jpeg,image/webp"></div><p id="custom-hint" data-i18n="customHint"></p><p id="custom-error" role="alert"></p><div class="custom-actions"><button type="submit" class="chip" id="custom-save" data-i18n="saveTheme"></button><button type="button" class="chip" id="custom-cancel" data-i18n="cancel"></button></div></form></dialog>`;
+  <dialog id="custom-dialog" aria-labelledby="custom-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="custom-title"></h3><button type="button" id="custom-close" class="chip">×</button></div></div><form id="custom-form"><div class="row"><label for="custom-name" data-i18n="themeName"></label><input id="custom-name" required></div><div class="row"><label for="custom-background" data-i18n="backgroundColor"></label><input id="custom-background" type="color"></div><div class="row"><label for="custom-foreground" data-i18n="textColor"></label><input id="custom-foreground" type="color"></div><div class="row"><label for="custom-accent" data-i18n="accentColor"></label><input id="custom-accent" type="color"></div><div class="row"><label for="custom-auto-accent" data-i18n="autoAccent"></label><input id="custom-auto-accent" type="checkbox" role="switch"></div><div class="row"><label for="custom-optimize" data-i18n="optimizeWallpaper"></label><input id="custom-optimize" type="checkbox" role="switch"></div><div id="custom-preview"></div><p id="custom-image-info" role="status"></p><div class="custom-actions"><button type="button" class="chip" id="custom-upload" data-i18n="uploadWallpaper"></button><button type="button" class="chip" id="custom-remove" data-i18n="removeWallpaper"></button><input hidden id="custom-image" type="file" accept="image/png,image/jpeg,image/webp"></div><p id="custom-hint" data-i18n="customHint"></p><p id="custom-error" role="alert"></p><div class="custom-actions"><button type="submit" class="chip" id="custom-save" data-i18n="saveTheme"></button><button type="button" class="chip" id="custom-cancel" data-i18n="cancel"></button></div></form></dialog>`;
   const $ = id => shadow.getElementById(id);
   function current() { return themes.find(t => t.name === settings.theme) || themes.find(t => t.name === 'Senko') || themes[0]; }
   function translate() {
@@ -342,13 +355,14 @@
   }
   function pickAccent(){if(!$('custom-auto-accent').checked)return;const bg=rgb($('custom-background').value);$('custom-accent').value=hex(readable(rgb(draftAccent||current().colors.accent),[bg,mix(bg,readable(rgb($('custom-foreground').value),[bg],7),.09)],3.1));}
   function previewCustom(){
+    const fmt=bytes=>{const power=bytes>=1048576?2:bytes>=1024?1:0,units=settings.language.startsWith('ru')?['Б','КБ','МБ']:['B','KB','MB'];return new Intl.NumberFormat(host.lang||'en',{maximumFractionDigits:2}).format(bytes/1024**power)+' '+units[power];};$('custom-image-info').textContent=draftImage?`${tr('imageSize')}: ${fmt(imageBytes(draftOriginal))}${draftImage!==draftOriginal?' → '+fmt(imageBytes(draftImage)):''}`:'';
     const p=$('custom-preview'),bg=$('custom-background').value,base=rgb(bg),fg=hex(readable(rgb($('custom-foreground').value),[base,mix(base,[255,255,255],.1),mix(base,[0,0,0],.1)]));p.style.backgroundColor=bg;p.style.color=fg;p.style.backgroundImage=draftImage?`linear-gradient(${bg}e6,${bg}e6),url(${JSON.stringify(draftImage)})`:'none';p.textContent=$('custom-name').value||tr('themeName');p.style.borderColor=$('custom-accent').value;
   }
   function editCustom(theme){
-    editing=theme;draftAccent=null;$('custom-auto-accent').checked=theme?theme.autoAccent===true:true;draftImage=theme?.images[0].data||'';if(draftImage===blankImage)draftImage='';
+    editing=theme;draftAccent=null;$('custom-optimize').checked=theme?.optimizeWallpaper!==false;$('custom-auto-accent').checked=theme?theme.autoAccent===true:true;draftImage=theme?.images[0].data||'';if(draftImage===blankImage)draftImage='';draftOriginal=draftImage;
     $('custom-title').textContent=tr(theme?'editTheme':'createTheme');$('custom-name').value=theme?.name||'';
     for(const field of ['background','foreground','accent'])$('custom-'+field).value=(theme||current()).colors[field];
-    $('custom-error').textContent='';$('custom-image').value='';previewCustom();$('custom-dialog').showModal();$('custom-name').focus();if(draftImage)customOperation(async()=>{draftAccent=wallpaperAccent(await decodeImage(draftImage));pickAccent();previewCustom();},$('custom-error'));else{pickAccent();previewCustom();}
+    $('custom-error').textContent='';$('custom-image').value='';previewCustom();$('custom-dialog').showModal();$('custom-name').focus();if(draftImage)customOperation(async()=>{const img=await decodeImage(draftOriginal);draftImage=await optimizedWallpaper(img,draftOriginal,$('custom-optimize').checked);draftAccent=wallpaperAccent(img);pickAccent();previewCustom();},$('custom-error'));else{pickAccent();previewCustom();}
   }
   async function customOperation(action,errorElement=$('status')){
     if(customBusy)return;customBusy=true;syncSelectionDisplay();$('custom-save').disabled=true;errorElement.textContent='';
@@ -359,24 +373,26 @@
   for(const id of ['custom-close','custom-cancel'])$(id).onclick=()=>{if(!customBusy){$('custom-dialog').close();$('theme-picker').focus();}};
   $('custom-close').setAttribute('aria-label',tr('close'));
   $('custom-dialog').addEventListener('cancel',e=>{if(customBusy)e.preventDefault();});
+  $('custom-dialog').addEventListener('close',()=>{draftImage='';draftOriginal='';draftAccent=null;editing=null;$('custom-preview').style.backgroundImage='none';$('custom-image').value='';});
   for(const id of ['custom-name','custom-background','custom-foreground'])$(id).oninput=()=>{pickAccent();previewCustom();};$('custom-accent').oninput=()=>{$('custom-auto-accent').checked=false;previewCustom();};$('custom-auto-accent').onchange=()=>{pickAccent();previewCustom();};
+  $('custom-optimize').onchange=()=>customOperation(async()=>{if(draftOriginal){draftImage=await optimizedWallpaper(await decodeImage(draftOriginal),draftOriginal,$('custom-optimize').checked);previewCustom();}},$('custom-error'));
   $('custom-upload').onclick=()=>$('custom-image').click();
-  $('custom-remove').onclick=()=>{if(!customBusy){draftImage='';draftAccent=null;pickAccent();previewCustom();}};
+  $('custom-remove').onclick=()=>{if(!customBusy){draftImage='';draftOriginal='';draftAccent=null;pickAccent();previewCustom();}};
   $('custom-image').onchange=()=>customOperation(async()=>{
     const file=$('custom-image').files[0];if(!file)return;
     if(!['image/png','image/jpeg','image/webp'].includes(file.type))throw new Error('imageError');
     const object=URL.createObjectURL(file);
-    try{const img=await decodeImage(object);const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('imageError'));reader.readAsDataURL(file);});draftImage=data;draftAccent=wallpaperAccent(img);pickAccent();previewCustom();}finally{URL.revokeObjectURL(object);}
+    try{const img=await decodeImage(object);const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('imageError'));reader.readAsDataURL(file);});draftOriginal=data;draftImage=await optimizedWallpaper(img,data,$('custom-optimize').checked);draftAccent=wallpaperAccent(img);pickAccent();previewCustom();}finally{URL.revokeObjectURL(object);}
   },$('custom-error'));
   $('custom-form').onsubmit=event=>{event.preventDefault();customOperation(async()=>{
-    const t=validateCustom({name:$('custom-name').value,colors:Object.fromEntries(['background','foreground','accent'].map(f=>[f,$('custom-'+f).value])),wallpaper:draftImage,autoAccent:$('custom-auto-accent').checked});uniqueName(t.name,editing);
+    const t=validateCustom({name:$('custom-name').value,colors:Object.fromEntries(['background','foreground','accent'].map(f=>[f,$('custom-'+f).value])),wallpaper:draftImage,autoAccent:$('custom-auto-accent').checked,optimizeWallpaper:$('custom-optimize').checked});uniqueName(t.name,editing);
     const next=themes.filter(t=>t.custom&&t!==editing);next.push(t);await storeCustom(next);
     settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();await selectionWrite;$('custom-dialog').close();$('theme-picker').focus();$('status').textContent=tr('customSaved');
   },$('custom-error'));};
   $('custom-delete').onclick=()=>{const t=current();if(!t.custom||!confirm(tr('deleteConfirm')))return;customOperation(async()=>{await storeCustom(themes.filter(x=>x.custom&&x!==t));deactivateDoki();populate();apply();await selectionWrite;renderGallery();});};
   $('custom-export').onclick=()=>{if(!current().custom)return;const t=current(),blob=new Blob([JSON.stringify({format:'codex-doki-theme',version:1,theme:portable(t)},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=t.name.replace(/[^a-z0-9_-]/gi,'_')+'.json';shadow.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);};
   $('custom-import').onclick=()=>{$('custom-import-file').value='';$('custom-import-file').click();};
-  $('custom-import-file').onchange=()=>customOperation(async()=>{const file=$('custom-import-file').files[0];if(!file)return;const payload=JSON.parse(await file.text());if(payload.format!=='codex-doki-theme'||payload.version!==1)throw new Error('formatError');const t=validateCustom(payload.theme);uniqueName(t.name);if(t.images[0].data!==blankImage)await decodeImage(t.images[0].data);const next=themes.filter(t=>t.custom);await storeCustom([...next,t]);settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();await selectionWrite;$('status').textContent=tr('imported');});
+  $('custom-import-file').onchange=()=>customOperation(async()=>{const file=$('custom-import-file').files[0];if(!file)return;const payload=JSON.parse(await file.text());if(payload.format!=='codex-doki-theme'||payload.version!==1)throw new Error('formatError');const t=validateCustom(payload.theme);uniqueName(t.name);if(t.images[0].data!==blankImage){const img=await decodeImage(t.images[0].data);t.images[0].data=await optimizedWallpaper(img,t.images[0].data,t.optimizeWallpaper);}const next=themes.filter(t=>t.custom);await storeCustom([...next,t]);settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();await selectionWrite;$('status').textContent=tr('imported');});
 
   const integrationStyle=document.createElement('style');
   integrationStyle.id='doki-settings-integration-style';

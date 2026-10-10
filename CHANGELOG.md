@@ -5,7 +5,9 @@
 - Create, edit and delete personal palettes with an optional local wallpaper.
 - Save custom themes in the Codex Doki profile without artificial file-size or theme-count limits, and select them from the preview gallery.
 - Import and export versioned JSON files containing colors and embedded artwork.
-- Preserve original wallpaper bytes, resolution and quality; automatically choose the accent from the wallpaper, with a manual override.
+- Automatically optimize wallpapers over 2 MB or 3840 px into WebP at quality 90%, keeping proportions and transparency; keep the original when compression is not smaller or optimization is disabled.
+- Show before/after file sizes in the editor. Optimize uploads, JSON imports and existing wallpapers when editing; never modify the original disk file.
+- Automatically choose the accent from the wallpaper, with a manual override.
 - Validate imports with specific error messages and retain automatic text contrast correction.
 - Persist selection alongside themes using durable database transactions and restore it before applying the initial palette.
 - Follow the Codex interface language (English and Russian editor labels; English fallback elsewhere).
