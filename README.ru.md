@@ -3,6 +3,20 @@
 Оригинальные темы и персонажи Doki в приложении Codex для Windows.
 Галерея с превью находится в **Настройки → Внешний вид → Doki Theme**.
 
+[English instructions](README.md)
+
+## Скриншоты
+
+Интерфейс автоматически следует языку Codex. Ниже — настройки и галерея тем **на русском и английском**.
+Нажмите на изображение, чтобы посмотреть его в полном размере.
+
+| Русский | English |
+| --- | --- |
+| ![Настройки Doki на русском](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/settings-ru.png) | ![Doki settings in English](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/settings-en.png) |
+| ![Галерея тем на русском](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/gallery-ru.png) | ![Theme gallery in English](https://raw.githubusercontent.com/VaczZUwU/codex-doki/main/docs/screenshots/gallery-en.png) |
+
+## Возможности
+
 88 тем, 103 иллюстрации, выбор вариантов, настройка яркости стартового экрана и фона за текстом.
 Палитра применяется к чату, боковой панели и штатным настройкам. Подсветка кода сохраняется.
 Язык следует языку Codex: 65 локализаций в проверенной версии.

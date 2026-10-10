@@ -10,7 +10,9 @@ Upstream: https://github.com/doki-theme/doki-theme-vscode
 
 Software license: MIT, copyright (c) 2022 Alex Simons.
 See https://github.com/doki-theme/doki-theme-vscode/blob/master/LICENSE for the complete upstream license.
-No upstream extension files or image files are included in this source release.
+No upstream extension files or original wallpaper files are included in the release ZIP.
+Repository documentation includes interface screenshots containing Doki artwork; these are previews,
+and do not grant permission to reuse or redistribute the depicted artwork separately.
 Character names, anime titles, artwork and trademarks belong to their respective owners.
 The MIT license on this project does not license those artworks or establish redistribution permission.
 
