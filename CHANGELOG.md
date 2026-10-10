@@ -4,6 +4,7 @@
 
 - Rename the repository to `codex-themes`; retain existing profile and launcher names for compatibility.
 - Check public GitHub releases at startup, display a localized notification/settings status, and link to manual installation. Offline startup remains available.
+- Support animated GIF, WebP and PNG wallpapers in custom themes, including previews, JSON import/export and restart persistence. Preserve animation bytes instead of flattening them during static optimization.
 - Create, edit and delete personal palettes with an optional local wallpaper.
 - Save custom themes in the Codex Doki profile without artificial file-size or theme-count limits, and select them from the preview gallery.
 - Import and export versioned JSON files containing colors and embedded artwork.

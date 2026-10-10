@@ -9,7 +9,7 @@ FILES = ['VERSION', 'LICENSE', 'README.md', 'README.ru.md', 'CHANGELOG.md',
          'THIRD_PARTY_NOTICES.md', 'Install.cmd', 'Uninstall.cmd', 'install.py',
          '.gitignore', '.gitattributes', 'src/doki.js', 'tests/test_installer.py',
          'scripts/package_release.py', 'docs/COMPATIBILITY.md', 'docs/RELEASING.md', 'docs/VALIDATION.md',
-         'src/themes.json', 'src/update-check.cjs', 'tests/test_update_checker.cjs', 'tests/test_custom_themes.py', 'licenses/Doki-Theme-MIT.txt',
+         'src/themes.json', 'src/update-check.cjs', 'tests/test_update_checker.cjs', 'tests/test_custom_themes.py', 'tests/animated_wallpapers.json', 'licenses/Doki-Theme-MIT.txt',
          '.github/workflows/ci.yml', '.github/workflows/release.yml']
 
 

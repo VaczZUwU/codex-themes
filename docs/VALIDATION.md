@@ -42,3 +42,5 @@ The release should remain an experimental prerelease while this final installati
 - Browser tests verify the update notification, release link, Russian translation, dismissal and settings status.
 - Patched and restarted the isolated desktop runtime. Its main process successfully fetched releases from `VaczZUwU/codex-themes` and persisted the startup-check cache in the existing profile.
 - The native renderer CSP remains unchanged; the main process performs the network check.
+
+- Animated background tests use synthetic two-frame looping GIF, WebP and APNG fixtures wider than the optimization threshold. Upload, export/import, editing and full Chromium restarts preserve every original byte with optimization enabled.

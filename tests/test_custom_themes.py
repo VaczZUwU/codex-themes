@@ -30,6 +30,43 @@ class Handler(BaseHTTPRequestHandler):
 
 @unittest.skipIf(sync_playwright is None, 'Install playwright and Chromium for browser checks')
 class CustomThemes(unittest.TestCase):
+    def test_animated_wallpapers_preserve_frames_import_and_restart(self):
+        # Two-frame looping fixtures are wider than the static optimization threshold.
+        fixtures=json.loads((ROOT/'tests/animated_wallpapers.json').read_text())
+        server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
+        threading.Thread(target=server.serve_forever,daemon=True).start()
+        try:
+            with tempfile.TemporaryDirectory() as profile,sync_playwright() as p:
+                def launch():
+                    context=p.chromium.launch_persistent_context(profile,viewport={'width':1000,'height':1050},accept_downloads=True)
+                    page=context.pages[0];page.goto(f'http://127.0.0.1:{server.server_port}/');page.locator('#doki-settings-tab').click()
+                    return context,page,page.locator('#doki-controls')
+                for mime,encoded in fixtures.items():
+                    context,page,h=launch();name='Animated '+mime
+                    h.locator('#custom-create').click();h.locator('#custom-name').fill(name)
+                    expect(h.locator('#custom-optimize')).to_be_checked()
+                    h.locator('#custom-image').set_input_files({'name':'animation.'+mime.split('/')[1],'mimeType':mime,'buffer':base64.b64decode(encoded)})
+                    expect(h.locator('#custom-save')).to_be_enabled()
+                    self.assertNotIn('→',h.locator('#custom-image-info').inner_text())
+                    h.locator('#custom-save').click();expect(h.locator('#custom-dialog')).not_to_be_visible()
+                    expected='data:'+mime+';base64,'+encoded
+                    self.assertEqual(page.evaluate('window.__dokiThemeStatus.image'),expected)
+                    with page.expect_download() as dl:h.locator('#custom-export').click()
+                    payload=json.loads(Path(dl.value.path()).read_text())
+                    self.assertEqual(payload['theme']['wallpaper'],expected)
+                    payload['theme']['name']='Imported '+name
+                    h.locator('#custom-import-file').set_input_files({'name':'animation.json','mimeType':'application/json','buffer':json.dumps(payload).encode()})
+                    expect(h.locator('#theme-name')).to_have_text(payload['theme']['name'])
+                    self.assertEqual(page.evaluate('window.__dokiThemeStatus.image'),expected)
+                    context.close();context,page,h=launch()
+                    expect(h.locator('#theme-name')).to_have_text(payload['theme']['name'])
+                    self.assertEqual(page.evaluate('window.__dokiThemeStatus.image'),expected)
+                    h.locator('#custom-edit').click();expect(h.locator('#custom-save')).to_be_enabled()
+                    h.locator('#custom-save').click();expect(h.locator('#custom-dialog')).not_to_be_visible()
+                    self.assertEqual(page.evaluate('window.__dokiThemeStatus.image'),expected)
+                    context.close()
+        finally:server.shutdown();server.server_close()
+
     def test_original_large_image_auto_accent_and_full_process_restart(self):
         def chunk(kind,data): return struct.pack('>I',len(data))+kind+data+struct.pack('>I',zlib.crc32(kind+data)&0xffffffff)
         # A wide red image with harmless trailing bytes exceeds the old 8 MB input limit.
@@ -129,7 +166,7 @@ class CustomThemes(unittest.TestCase):
                 h.locator('#custom-import-file').set_input_files({'name':'theme.json','mimeType':'application/json','buffer':json.dumps(payload).encode()})
                 expect(h.locator('#theme-name')).to_have_text('Imported Aurora')
                 # Reject remote resources, malformed colors, and duplicate built-in names without mutating the selected theme.
-                for change,message in [({'wallpaper':'https://example.com/x.png'},'Could not read the image. Choose a valid PNG, JPEG or WebP.'), ({'colors':{'background':'red'}},'Use a valid color in #RRGGBB format.'), ({'name':'Senko'},'A theme with this name already exists. Choose a different name.')]:
+                for change,message in [({'wallpaper':'https://example.com/x.png'},'Could not read the image. Choose a valid PNG, JPEG, WebP or GIF.'), ({'colors':{'background':'red'}},'Use a valid color in #RRGGBB format.'), ({'name':'Senko'},'A theme with this name already exists. Choose a different name.')]:
                     bad={**payload,'theme':{**payload['theme'],**change}}
                     h.locator('#custom-import-file').set_input_files({'name':'invalid.json','mimeType':'application/json','buffer':json.dumps(bad).encode()})
                     expect(h.locator('#status')).to_have_text(message)
