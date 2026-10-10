@@ -23,3 +23,13 @@ jobs:
       - run: python -m unittest discover -s tests -v
       - run: node --check src/doki.js
       - run: python scripts/package_release.py
+  custom-theme-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install playwright
+      - run: python -m playwright install --with-deps chromium
+      - run: python -m unittest discover -s tests -p test_custom_themes.py -v

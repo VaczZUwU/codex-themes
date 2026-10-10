@@ -25,3 +25,10 @@ runtime copy would exceed available disk space. The original Codex installation 
 
 GitHub CI checks run on Windows and Linux when changes are pushed.
 The release should remain an experimental prerelease while this final installation check is pending.
+
+## Custom-theme development checks
+
+- Browser regression test covers palette creation, WebP image normalization, persistence across reloads, renaming, JSON export/import, rejected remote images/invalid colors/duplicate preset names, English/Russian editor labels, native theme deactivation, gallery reactivation, deletion and preservation through settings reset.
+- Uploaded pictures and JSON imports are stored locally in IndexedDB. The existing CSP permits blob/data images; no CSP changes are required.
+- Updated the isolated working desktop copy and visually inspected the Russian editor inside the native Appearance settings at 100% zoom.
+- Browser editor snapshots use a controlled test fixture and are kept as local QA artifacts; they are not presented as native-app screenshots in the README.

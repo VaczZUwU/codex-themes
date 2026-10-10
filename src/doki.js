@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   if (new URL(location.href).searchParams.get('initialRoute') === '/avatar-overlay') return;
-  const themes = DOKI_THEMES;
+  const themes = [...DOKI_THEMES];
   const key = 'codex-doki-settings-v1';
   const defaults = {theme: 'Senko', variant: 'default', opacity: 0.75, dark: true, enabled: true, active: true, language: 'en', themeReading: true, readingOpacity: 0.11};
   let settings = {...defaults};
@@ -15,7 +15,7 @@
   Object.assign(messages.ru,{visualStyle:'Визуальный стиль',wallpaper:'Фон',general:'Общие',chooseTheme:'Выберите тему',empty:'Темы не найдены',close:'Закрыть',notSelected:'Не выбрана'});
   Object.assign(messages,DOKI_LOCALES);
   // Keep the more descriptive Doki-specific labels for English and Russian.
-  Object.assign(messages['ru-RU'],messages.ru);
+  Object.assign(messages['ru-RU']??={},messages.ru);
   function codexLanguage() {
     const locale=(root.lang||'en').replaceAll('_','-');
     const aliases={'zh-Hans':'zh-CN','zh-Hant':'zh-TW','es':'es-419','fr':'fr-FR','pt':'pt-BR'};
@@ -38,6 +38,28 @@
     if(language==='en')return `${number} ${count===1?'variant':'variants'}`;
     return `${tr('variant')} × ${number}`;
   }
+  Object.assign(messages.en,{customThemes:'Custom themes',createTheme:'Create theme',editTheme:'Edit theme',importTheme:'Import JSON',exportTheme:'Export JSON',deleteTheme:'Delete theme',themeName:'Name',backgroundColor:'Background',textColor:'Text',accentColor:'Accent',uploadWallpaper:'Choose wallpaper',removeWallpaper:'Remove wallpaper',saveTheme:'Save and apply',cancel:'Cancel',customHint:'PNG, JPEG or WebP. Images are resized to 1600 px and stored in this Codex Doki profile.',customError:'Could not save or load the theme. Use a unique name, valid colors and an image under 8 MB.',deleteConfirm:'Delete this custom theme?',customSaved:'Theme saved.',imported:'Theme imported.',noWallpaper:'No wallpaper',customLoading:'Loading custom themes…'});
+  Object.assign(messages.ru,{customThemes:'Свои темы',createTheme:'Создать тему',editTheme:'Изменить тему',importTheme:'Импорт JSON',exportTheme:'Экспорт JSON',deleteTheme:'Удалить тему',themeName:'Название',backgroundColor:'Фон',textColor:'Текст',accentColor:'Акцент',uploadWallpaper:'Выбрать фон',removeWallpaper:'Убрать фон',saveTheme:'Сохранить и применить',cancel:'Отмена',customHint:'PNG, JPEG или WebP. Изображения уменьшаются до 1600 пикселей и сохраняются в этом профиле Codex Doki.',customError:'Не удалось сохранить или загрузить тему. Нужны уникальное название, корректные цвета и картинка до 8 МБ.',deleteConfirm:'Удалить эту свою тему?',customSaved:'Тема сохранена.',imported:'Тема импортирована.',noWallpaper:'Без картинки',customLoading:'Загрузка своих тем…'});
+  Object.assign(messages['ru-RU'],messages.ru);
+  const blankImage='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYGBgAAAABQABpfZFQAAAAABJRU5ErkJggg==';
+  const imageURL=image=>image.data||new URL(`./doki/${image.file}`,document.baseURI).href;
+  let customDB, customBusy=false, editing=null, draftImage='';
+  function database(){return new Promise((resolve,reject)=>{const request=indexedDB.open('codex-doki-custom-v1',1);request.onupgradeneeded=()=>request.result.createObjectStore('themes');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});}
+  async function storeCustom(next){
+    if(!customDB)throw new Error('Storage unavailable');
+    await new Promise((resolve,reject)=>{const tx=customDB.transaction('themes','readwrite');tx.objectStore('themes').put(next,'all');tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);});
+    themes.splice(DOKI_THEMES.length,themes.length-DOKI_THEMES.length,...next);
+  }
+  function validateCustom(value){
+    if(!value||typeof value.name!=='string'||!value.name.trim()||value.name.trim().length>80)throw new Error('Name');
+    const colors={};for(const field of ['background','foreground','accent']){if(!/^#[0-9a-f]{6}$/i.test(value.colors?.[field]||''))throw new Error('Color');colors[field]=value.colors[field];}
+    const data=value.wallpaper??'';
+    if(typeof data!=='string'||data.length>3000000||(data&&!/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]+=*$/.test(data)))throw new Error('Image');
+    return {name:value.name.trim(),custom:true,group:'Custom',dark:luminance(rgb(colors.background))<.5,colors,images:[{variant:'default',data:data||blankImage,readingOpacity:.1,anchor:'right'}]};
+  }
+  const portable=t=>({name:t.name,colors:{...t.colors},wallpaper:t.images[0].data===blankImage?'':t.images[0].data});
+  function uniqueName(name,except){if(themes.some(t=>t!==except&&t.name.toLowerCase()===name.toLowerCase()))throw new Error('Duplicate');}
+  async function decodeImage(data){const img=new Image();img.src=data;await img.decode();if(!img.naturalWidth||!img.naturalHeight||img.naturalWidth*img.naturalHeight>50000000)throw new Error('Image dimensions');return img;}
   const style = document.createElement('style');
   style.id = 'doki-theme-style';
   document.head.append(style);
@@ -70,6 +92,7 @@
     .variant-count{display:block;margin-top:7px;font-size:10px;font-weight:400;color:var(--color-text-secondary)}
     #artwork-dialog{width:min(480px,calc(100vw - 48px))}#artwork-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:20px}#artwork-gallery.single{grid-template-columns:1fr}#artwork-gallery .thumbnail{height:150px}
     @media(max-width:600px){.range{width:150px}input[type=range]{width:105px}.row{gap:10px}.previews{gap:10px}.preview{height:115px}#gallery{grid-template-columns:repeat(2,minmax(0,1fr))}select{max-width:160px}}
+    #custom-dialog{width:min(540px,calc(100vw - 48px));max-height:85vh;overflow:auto}#custom-form{padding:20px}#custom-form .row{gap:12px}#custom-name{width:240px;max-width:60%;background:var(--color-surface-secondary);border:1px solid var(--color-border);border-radius:8px;padding:8px}input[type=color]{width:44px;height:30px;border:1px solid var(--color-border);border-radius:6px;background:transparent;padding:2px;cursor:pointer}.custom-actions{display:flex;gap:8px;flex-wrap:wrap;padding:12px 0}.custom-actions .chip{font-size:12px}#custom-preview{height:150px;border-radius:10px;background-size:cover;background-position:right center;border:1px solid var(--color-border);padding:16px}#custom-hint,#custom-error{font-size:12px;line-height:1.5}#custom-error{min-height:18px;color:var(--color-text)}.chip:disabled{opacity:.5;cursor:default}
   </style><section id="panel" aria-label="Doki Theme">
     <h2 data-i18n="visualStyle"></h2>
     <div class="group">
@@ -85,10 +108,12 @@
       <div class="row"><label for="reading" data-i18n="reading"></label><div class="range"><input id="reading" type="range" min="0" max="100"><output id="reading-value" for="reading"></output></div></div>
       <div class="row"><label for="theme-reading" data-i18n="themeReading"></label><input id="theme-reading" type="checkbox" role="switch"></div>
     </div>
+    <h2 data-i18n="customThemes"></h2><div class="group"><div class="custom-actions"><button type="button" class="chip" id="custom-create" data-i18n="createTheme"></button><button type="button" class="chip" id="custom-edit" data-i18n="editTheme"></button><button type="button" class="chip" id="custom-import" data-i18n="importTheme"></button><button type="button" class="chip" id="custom-export" data-i18n="exportTheme"></button><button type="button" class="chip" id="custom-delete" data-i18n="deleteTheme"></button></div><input hidden id="custom-import-file" type="file" accept=".json,application/json"></div>
     <footer><span id="count"></span><button class="chip" id="reset" data-i18n="reset"></button></footer><small id="status" role="status"></small>
   </section><button id="toggle">Doki</button>
   <dialog id="theme-dialog" aria-labelledby="gallery-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="gallery-title" data-i18n="chooseTheme"></h3><button id="close-gallery" type="button" aria-label="Close">×</button></div><input id="search" type="search" placeholder="Senko, Rem, Fate…"></div><div id="gallery"></div></dialog>
-  <dialog id="artwork-dialog" aria-labelledby="artwork-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="artwork-title" data-i18n="variant"></h3><button id="close-artwork" type="button" aria-label="Close">×</button></div></div><div id="artwork-gallery"></div></dialog>`;
+  <dialog id="artwork-dialog" aria-labelledby="artwork-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="artwork-title" data-i18n="variant"></h3><button id="close-artwork" type="button" aria-label="Close">×</button></div></div><div id="artwork-gallery"></div></dialog>
+  <dialog id="custom-dialog" aria-labelledby="custom-title"><div class="gallery-header"><div class="gallery-heading"><h3 id="custom-title"></h3><button type="button" id="custom-close" class="chip">×</button></div></div><form id="custom-form"><div class="row"><label for="custom-name" data-i18n="themeName"></label><input id="custom-name" maxlength="80" required></div><div class="row"><label for="custom-background" data-i18n="backgroundColor"></label><input id="custom-background" type="color"></div><div class="row"><label for="custom-foreground" data-i18n="textColor"></label><input id="custom-foreground" type="color"></div><div class="row"><label for="custom-accent" data-i18n="accentColor"></label><input id="custom-accent" type="color"></div><div id="custom-preview"></div><div class="custom-actions"><button type="button" class="chip" id="custom-upload" data-i18n="uploadWallpaper"></button><button type="button" class="chip" id="custom-remove" data-i18n="removeWallpaper"></button><input hidden id="custom-image" type="file" accept="image/png,image/jpeg,image/webp"></div><p id="custom-hint" data-i18n="customHint"></p><p id="custom-error" role="alert"></p><div class="custom-actions"><button type="submit" class="chip" id="custom-save" data-i18n="saveTheme"></button><button type="button" class="chip" id="custom-cancel" data-i18n="cancel"></button></div></form></dialog>`;
   const $ = id => shadow.getElementById(id);
   function current() { return themes.find(t => t.name === settings.theme) || themes.find(t => t.name === 'Senko') || themes[0]; }
   function translate() {
@@ -96,7 +121,8 @@
     host.lang=root.lang||settings.language;host.dir=['ar','fa','ur'].includes(settings.language.split('-')[0])?'rtl':'ltr';
     $('toggle').title=tr('settings');$('count').textContent=`${themes.length}${tr('themes')?' '+tr('themes'):''} · Doki 88.1.18`;
     $('search').setAttribute('aria-label',tr('search'));$('search').placeholder=tr('search');$('close-gallery').setAttribute('aria-label',tr('close'));
-    $('close-artwork').setAttribute('aria-label',tr('close'));
+    $('close-artwork').setAttribute('aria-label',tr('close'));$('custom-close').setAttribute('aria-label',tr('close'));
+    if($('custom-dialog').open){$('custom-title').textContent=tr(editing?'editTheme':'createTheme');previewCustom();}
     variants();renderGallery();
   }
   function populate() {
@@ -106,7 +132,7 @@
     const groups = new Map();
     for (const t of themes) {
       if (query && !`${t.name} ${t.group}`.toLowerCase().includes(query) && t.name !== selected.name) continue;
-      if (!groups.has(t.group)) { const g = document.createElement('optgroup');g.label=t.group;groups.set(t.group,g);$('theme').append(g); }
+      if (!groups.has(t.group)) { const g = document.createElement('optgroup');g.label=t.custom?tr('customThemes'):t.group;groups.set(t.group,g);$('theme').append(g); }
       const option = document.createElement('option');option.value=t.name;option.textContent=t.name;option.selected=t.name===selected.name;groups.get(t.group).append(option);
     }
     variants();
@@ -118,8 +144,8 @@
     for(const t of matching){
       const card=document.createElement('button');card.type='button';card.className='theme-card';card.setAttribute('aria-pressed',String(settings.active&&t.name===current().name));card.title=`${t.name} · ${t.group} · ${variantCount(t.images.length)}`;
       card.style.setProperty('--card-bg',t.colors.background);
-      const thumb=document.createElement('div');thumb.className='thumbnail';const img=document.createElement('img');img.loading='lazy';img.alt='';img.src=new URL(`./doki/${t.images[0].file}`,document.baseURI).href;thumb.append(img);
-      const label=document.createElement('span');label.className='card-label';label.textContent=t.name;const group=document.createElement('span');group.className='card-group';group.textContent=t.group;const count=document.createElement('span');count.className='variant-count';count.textContent=variantCount(t.images.length);label.append(group,count);card.append(thumb,label);
+      const thumb=document.createElement('div');thumb.className='thumbnail';const img=document.createElement('img');img.loading='lazy';img.alt='';img.src=imageURL(t.images[0]);thumb.append(img);
+      const label=document.createElement('span');label.className='card-label';label.textContent=t.name;const group=document.createElement('span');group.className='card-group';group.textContent=t.custom?tr('customThemes'):t.group;const count=document.createElement('span');count.className='variant-count';count.textContent=variantCount(t.images.length);label.append(group,count);card.append(thumb,label);
       card.onclick=()=>{settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();$('theme-dialog').close();$('theme-picker').focus();};$('gallery').append(card);
     }
     if(!matching.length){const empty=document.createElement('div');empty.className='empty';empty.textContent=tr('empty');$('gallery').append(empty);}
@@ -131,7 +157,7 @@
     const t=current();$('artwork-gallery').classList.toggle('single',t.images.length===1);$('artwork-gallery').replaceChildren();
     for(const artwork of t.images){
       const card=document.createElement('button');card.type='button';card.className='theme-card';card.setAttribute('aria-pressed',String(artwork.variant===settings.variant));card.style.setProperty('--card-bg',settings.dark&&!t.dark?'#111214':t.colors.background);
-      const thumb=document.createElement('div');thumb.className='thumbnail';const img=document.createElement('img');img.alt='';img.src=new URL(`./doki/${artwork.file}`,document.baseURI).href;img.style.objectPosition=`${artwork.anchor==='left'?'left':'right'} center`;thumb.append(img);
+      const thumb=document.createElement('div');thumb.className='thumbnail';const img=document.createElement('img');img.alt='';img.src=imageURL(artwork);img.style.objectPosition=`${artwork.anchor==='left'?'left':'right'} center`;thumb.append(img);
       const label=document.createElement('span');label.className='card-label';label.textContent=tr(artwork.variant==='default'?'primary':'alternate');card.append(thumb,label);
       card.onclick=()=>{settings.active=true;settings.variant=artwork.variant;variants();apply();$('artwork-dialog').close();$('variant-picker').focus();};$('artwork-gallery').append(card);
     }
@@ -159,13 +185,13 @@
     return target;
   }
   function apply() {
-    const t = current(); const dark = settings.dark || t.dark;
-    const bg=dark?(t.dark?t.colors.background:'#111214'):t.colors.background;
+    const t = current(); const dark = (!t.custom && settings.dark) || t.dark;
+    const bg=t.custom?t.colors.background:dark?(t.dark?t.colors.background:'#111214'):t.colors.background;
     const base=rgb(bg);
-    const foreground=readable(rgb(dark?(t.dark?t.colors.foreground:'#eeeeee'):t.colors.foreground),[base],7);
+    const foreground=readable(rgb(t.custom?t.colors.foreground:dark?(t.dark?t.colors.foreground:'#eeeeee'):t.colors.foreground),[base],7);
     const fg=hex(foreground);
     const image=t.images.find(i=>i.variant===settings.variant)||t.images[0];
-    const url=new URL(`./doki/${image.file}`,document.baseURI).href;
+    const url=imageURL(image);
     const requestedReading=settings.themeReading?(image.readingOpacity??0.1):settings.readingOpacity;
     let readingOpacity=requestedReading;
     // Bound the wallpaper's worst possible light/dark pixel behind ordinary text.
@@ -240,6 +266,9 @@
   }
   function syncSelectionDisplay(){
     const selected=settings.active;
+    for(const id of ['custom-edit','custom-export','custom-delete'])$(id).disabled=customBusy||!selected||!current().custom;
+    $('custom-create').disabled=customBusy;$('custom-import').disabled=customBusy;
+    $('dark').disabled=selected&&!!current().custom;
     $('theme-thumb').hidden=!selected;$('variant-thumb').hidden=!selected;
     $('variant-picker').disabled=!selected;
     if(!selected){
@@ -293,6 +322,43 @@
   $('enabled').onchange=()=>{settings.enabled=$('enabled').checked;apply();};
   $('reset').onclick=()=>{const language=settings.language;settings={...defaults,language};$('search').value='';translate();populate();apply();};
   shadow.addEventListener('keydown',e=>{if(e.key==='Escape'&&!host.hasAttribute('data-embedded')){$('panel').classList.remove('open');$('toggle').setAttribute('aria-expanded','false');$('toggle').focus();}});
+  function previewCustom(){
+    const p=$('custom-preview'),bg=$('custom-background').value,base=rgb(bg),fg=hex(readable(rgb($('custom-foreground').value),[base,mix(base,[255,255,255],.1),mix(base,[0,0,0],.1)]));p.style.backgroundColor=bg;p.style.color=fg;p.style.backgroundImage=draftImage?`linear-gradient(${bg}e6,${bg}e6),url(${JSON.stringify(draftImage)})`:'none';p.textContent=$('custom-name').value||tr('themeName');p.style.borderColor=$('custom-accent').value;
+  }
+  function editCustom(theme){
+    editing=theme;draftImage=theme?.images[0].data||'';if(draftImage===blankImage)draftImage='';
+    $('custom-title').textContent=tr(theme?'editTheme':'createTheme');$('custom-name').value=theme?.name||'';
+    for(const field of ['background','foreground','accent'])$('custom-'+field).value=(theme||current()).colors[field];
+    $('custom-error').textContent='';$('custom-image').value='';previewCustom();$('custom-dialog').showModal();$('custom-name').focus();
+  }
+  async function customOperation(action,errorElement=$('status')){
+    if(customBusy)return;customBusy=true;syncSelectionDisplay();$('custom-save').disabled=true;errorElement.textContent='';
+    try{await action();}catch{errorElement.textContent=tr('customError');}
+    finally{customBusy=false;syncSelectionDisplay();$('custom-save').disabled=false;}
+  }
+  $('custom-create').onclick=()=>editCustom(null);$('custom-edit').onclick=()=>{if(current().custom)editCustom(current());};
+  for(const id of ['custom-close','custom-cancel'])$(id).onclick=()=>{if(!customBusy){$('custom-dialog').close();$('theme-picker').focus();}};
+  $('custom-close').setAttribute('aria-label',tr('close'));
+  $('custom-dialog').addEventListener('cancel',e=>{if(customBusy)e.preventDefault();});
+  for(const id of ['custom-name','custom-background','custom-foreground','custom-accent'])$(id).oninput=previewCustom;
+  $('custom-upload').onclick=()=>$('custom-image').click();
+  $('custom-remove').onclick=()=>{if(!customBusy){draftImage='';previewCustom();}};
+  $('custom-image').onchange=()=>customOperation(async()=>{
+    const file=$('custom-image').files[0];if(!file)return;
+    if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>8*1024*1024)throw new Error('Image size/type');
+    const object=URL.createObjectURL(file);
+    try{const img=await decodeImage(object),scale=Math.min(1,1600/img.naturalWidth,1600/img.naturalHeight),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);const data=canvas.toDataURL('image/webp',.9);if(data.length>3000000)throw new Error('Image too large');draftImage=data;previewCustom();}finally{URL.revokeObjectURL(object);}
+  },$('custom-error'));
+  $('custom-form').onsubmit=event=>{event.preventDefault();customOperation(async()=>{
+    const t=validateCustom({name:$('custom-name').value,colors:Object.fromEntries(['background','foreground','accent'].map(f=>[f,$('custom-'+f).value])),wallpaper:draftImage});uniqueName(t.name,editing);
+    const next=themes.filter(t=>t.custom&&t!==editing);if(next.length>=50)throw new Error('Limit');next.push(t);await storeCustom(next);
+    settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();$('custom-dialog').close();$('theme-picker').focus();$('status').textContent=tr('customSaved');
+  },$('custom-error'));};
+  $('custom-delete').onclick=()=>{const t=current();if(!t.custom||!confirm(tr('deleteConfirm')))return;customOperation(async()=>{await storeCustom(themes.filter(x=>x.custom&&x!==t));deactivateDoki();populate();apply();renderGallery();});};
+  $('custom-export').onclick=()=>{if(!current().custom)return;const t=current(),blob=new Blob([JSON.stringify({format:'codex-doki-theme',version:1,theme:portable(t)},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=t.name.replace(/[^a-z0-9_-]/gi,'_')+'.json';shadow.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);};
+  $('custom-import').onclick=()=>{$('custom-import-file').value='';$('custom-import-file').click();};
+  $('custom-import-file').onchange=()=>customOperation(async()=>{const file=$('custom-import-file').files[0];if(!file)return;if(file.size>4*1024*1024)throw new Error('File size');const payload=JSON.parse(await file.text());if(payload.format!=='codex-doki-theme'||payload.version!==1)throw new Error('Format');const t=validateCustom(payload.theme);uniqueName(t.name);if(t.images[0].data!==blankImage)await decodeImage(t.images[0].data);const next=themes.filter(t=>t.custom);if(next.length>=50)throw new Error('Limit');await storeCustom([...next,t]);settings.active=true;settings.theme=t.name;settings.variant='default';populate();apply();$('status').textContent=tr('imported');});
+
   const integrationStyle=document.createElement('style');
   integrationStyle.id='doki-settings-integration-style';
   integrationStyle.textContent=`
@@ -382,5 +448,13 @@
     if(settings.language!==language){settings.language=language;translate();apply();}
     syncCodeContrast();
   }).observe(root,{attributes:true,attributeFilter:['lang','data-theme']});
-  document.body.append(host);translate();populate();apply();syncAppearanceIntegration();
+  async function initialize(){
+    try{customDB=await database();const saved=await new Promise((resolve,reject)=>{const tx=customDB.transaction('themes');const r=tx.objectStore('themes').get('all');r.onsuccess=()=>resolve(r.result||[]);r.onerror=()=>reject(r.error);});
+      if(!Array.isArray(saved)||saved.length>50)throw new Error('Stored themes');
+      for(const entry of saved){const t=validateCustom(portable(entry));uniqueName(t.name);themes.push(t);}
+    }catch{customDB?.close();customDB=null;}
+    document.body.append(host);translate();populate();apply();syncAppearanceIntegration();
+    if(!customDB)$('status').textContent=tr('customError');
+  }
+  initialize();
 })();

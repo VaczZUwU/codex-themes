@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — Custom themes
+
+- Create, edit and delete personal palettes with an optional local wallpaper.
+- Save up to 50 custom themes in the Codex Doki profile and select them from the preview gallery.
+- Import and export versioned JSON files containing colors and embedded artwork.
+- Validate imports, resize uploaded pictures and retain automatic text contrast correction.
+- Follow the Codex interface language (English and Russian editor labels; English fallback elsewhere).
+
 ## 0.1.1 — Install without VS Code
 
 - Bundle the 88-theme catalog: VS Code and the Doki extension are no longer required.

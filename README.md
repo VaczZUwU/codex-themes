@@ -32,6 +32,16 @@ For Russian screenshots, see the [Russian instructions](README.ru.md#скрин�
 - Select a native Codex theme to turn off Doki. Its selector shows **Not selected** until you pick a Doki theme again.
 - Theme, artwork and brightness preferences persist between launches.
 
+## Custom themes (development version)
+
+Open **Settings → Appearance → Doki Theme → Custom themes → Create theme**.
+Choose a unique name, background/text/accent colors and an optional local wallpaper, then select **Save and apply**.
+Your themes appear alongside Doki presets in the preview gallery. **Edit theme**, **Delete theme** and **Export JSON** operate on the selected custom theme; **Import JSON** loads a previously exported file.
+
+Up to 50 custom themes are stored locally in the Codex Doki profile. PNG, JPEG and WebP wallpapers up to 8 MB are resized to a maximum of 1600 px; JSON includes the embedded image, so sharing the JSON also shares that image. Duplicate theme names are rejected. Resetting appearance preferences keeps saved custom themes. Native theme selection still disables Doki, and automatic contrast correction applies to your colors.
+
+The custom editor follows Codex's language with English and Russian labels; other languages use English for the new editor controls. This feature is currently in the source/development version; the previously published 0.1.1 ZIP does not include it.
+
 ## Install
 
 This is an **experimental, unofficial Windows modification**, not an official Codex extension.
